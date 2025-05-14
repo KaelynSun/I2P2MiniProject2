@@ -20,7 +20,7 @@ void ScoreboardScene::Initialize() {
     SortScores();
 
     // Title
-    AddNewObject(new Engine::Label("scoreboard-scene", "pirulen.ttf", 72, halfW, 60, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("scoreboard", "pirulen.ttf", 72, halfW, 60, 57, 255, 20, 255, 0.5, 0.5));
 
     // Display current page scores
     int startIdx = currentPage * entriesPerPage;
@@ -51,22 +51,22 @@ void ScoreboardScene::Initialize() {
     Engine::ImageButton* btn;
 
     // Previous Page
-    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW - 300, h - 100, 150, 50);
+    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW - 700, halfH * 3 / 1.75 - 50, 400, 100);
     btn->SetOnClickCallback(std::bind(&ScoreboardScene::PrevPageOnClick, this));
     AddNewControlObject(btn);
-    AddNewObject(new Engine::Label("PREV", "pirulen.ttf", 24, halfW - 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("PREV", "pirulen.ttf", 48, halfW - 500, halfH * 3 / 1.75, 0, 0, 0, 255, 0.5, 0.5));
 
     // Next Page
-    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW + 150, h - 100, 150, 50);
+    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW + 300, halfH * 3 / 1.75 - 50, 400, 100);
     btn->SetOnClickCallback(std::bind(&ScoreboardScene::NextPageOnClick, this));
     AddNewControlObject(btn);
-    AddNewObject(new Engine::Label("NEXT", "pirulen.ttf", 24, halfW + 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("NEXT", "pirulen.ttf", 48, halfW + 500, halfH * 3/ 1.75, 0, 0, 0, 255, 0.5, 0.5));
 
     // Back Button
-    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", 50, h - 70, 100, 50);
+    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png",  halfW - 200, halfH * 3 / 1.75 - 50, 400, 100);
     btn->SetOnClickCallback(std::bind(&ScoreboardScene::BackOnClick, this));
     AddNewControlObject(btn);
-    AddNewObject(new Engine::Label("BACK", "pirulen.ttf", 24, 100, h - 45, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("BACK", "pirulen.ttf", 48, halfW, halfH * 3 / 1.75, 0, 0, 0, 255, 0.5, 0.5));
 
     bgmInstance = AudioHelper::PlaySample("select.ogg", true, AudioHelper::BGMVolume);
 }
