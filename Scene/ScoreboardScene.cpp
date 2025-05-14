@@ -54,13 +54,13 @@ void ScoreboardScene::Initialize() {
     btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW - 300, h - 100, 150, 50);
     btn->SetOnClickCallback(std::bind(&ScoreboardScene::PrevPageOnClick, this));
     AddNewControlObject(btn);
-    AddNewObject(new Engine::Label("PREV PAGE", "pirulen.ttf", 24, halfW - 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("PREV", "pirulen.ttf", 24, halfW - 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
 
     // Next Page
     btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW + 150, h - 100, 150, 50);
     btn->SetOnClickCallback(std::bind(&ScoreboardScene::NextPageOnClick, this));
     AddNewControlObject(btn);
-    AddNewObject(new Engine::Label("NEXT PAGE", "pirulen.ttf", 24, halfW + 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("NEXT", "pirulen.ttf", 24, halfW + 225, h - 75, 0, 0, 0, 255, 0.5, 0.5));
 
     // Back Button
     btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", 50, h - 70, 100, 50);
