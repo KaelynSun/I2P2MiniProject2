@@ -146,6 +146,10 @@ void PlayScene::Update(float deltaTime) {
                 delete UIGroup;
                 delete imgTarget;*/
                 // Win.
+
+                int livesBonus = 200;
+                totalScore += 200;
+                SaveScore(totalScore);
                 Engine::GameEngine::GetInstance().ChangeScene("win");
                 return;
             }
@@ -181,6 +185,7 @@ void PlayScene::Update(float deltaTime) {
         // To keep responding when paused.
         preview->Update(deltaTime);
     }
+    
 }
 void PlayScene::Draw() const {
     IScene::Draw();
@@ -345,6 +350,25 @@ void PlayScene::ReadEnemyWave() {
     }
     fin.close();
 }
+
+void PlayScene::OnEnemyDefeated(Enemy *enemy){
+    if(enemy->type == "Soldier"){
+        AddScore(50);
+    }
+    
+    if(enemy->type == "Plane"){
+        AddScore(100);
+    }
+
+    if(enemy->type == "Tank"){
+        AddScore(150);
+    }
+}
+
+void PlayScene::AddScore(int points){
+    totalScore += points;
+}
+
 void PlayScene::ConstructUI() {
     // Background
     UIGroup->AddNewObject(new Engine::Image("play/sand.png", 1280, 0, 320, 832));
@@ -373,6 +397,23 @@ void PlayScene::ConstructUI() {
     dangerIndicator = new Engine::Sprite("play/benjamin.png", w - shift, h - shift);
     dangerIndicator->Tint.a = 0;
     UIGroup->AddNewObject(dangerIndicator);
+}
+
+// In PlayScene.cpp when player wins:
+void PlayScene::SaveScore(int score) {
+    // Get current time
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+
+    // Append the new score to the file
+    std::ofstream file("scores.json", std::ios::app);
+    if (file.is_open()) {
+        file << "Player" << ", " << score << ", " << MapId << ", " << buf << "\n";
+        file.close();
+    }
 }
 
 void PlayScene::UIBtnClicked(int id) {
