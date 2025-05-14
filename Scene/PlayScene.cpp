@@ -345,6 +345,25 @@ void PlayScene::ReadEnemyWave() {
     }
     fin.close();
 }
+
+void PlayScene::OnEnemyDefeated(Enemy *enemy){
+    if(enemy->type == "Soldier"){
+        AddScore(50);
+    }
+    
+    if(enemy->type == "Plane"){
+        AddScore(100);
+    }
+
+    if(enemy->type == "Tank"){
+        AddScore(150);
+    }
+}
+
+void PlayScene::AddScore(int points){
+    totalScore += points;
+}
+
 void PlayScene::ConstructUI() {
     // Background
     UIGroup->AddNewObject(new Engine::Image("play/sand.png", 1280, 0, 320, 832));
