@@ -76,8 +76,11 @@ public:
     void Hit();
     int GetMoney() const;
     void EarnMoney(int money);
+    void AddScore(int points);
+    void OnEnemyDefeated(Enemy* enemy);
     void ReadMap();
     void ReadEnemyWave();
+    void SaveScore(int score);
     void ConstructUI();
     void UIBtnClicked(int id);
     bool CheckSpaceValid(int x, int y);
