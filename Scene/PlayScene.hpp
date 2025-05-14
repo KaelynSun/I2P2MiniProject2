@@ -8,6 +8,7 @@
 
 #include "Engine/IScene.hpp"
 #include "Engine/Point.hpp"
+#include "Enemy/Enemy.hpp"
 
 class Turret;
 namespace Engine {
