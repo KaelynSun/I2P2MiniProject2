@@ -7,10 +7,10 @@
 {
     "configurations": [
         {
-            "name": "<your_os>",
+            "name": "Windows",
             "includePath": [
                 "${workspaceFolder}/**",
-                "<allegro_include_path>"
+                "C:\Users\Kaelyn\source\repos\allegro-test\packages\Allegro.5.2.10\build\native\include"
             ],
             "cppStandard": "c++17"
         }
