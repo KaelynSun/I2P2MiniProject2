@@ -5,6 +5,9 @@
 
 class WinScene final : public Engine::IScene {
 private:
+    std::string playerName;
+    bool nameEntered = false;
+    int finalScore = 0;
     float ticks;
     ALLEGRO_SAMPLE_ID bgmId;
 
