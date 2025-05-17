@@ -400,7 +400,7 @@ void PlayScene::ConstructUI() {
 }
 
 // In PlayScene.cpp when player wins:
-void PlayScene::SaveScore(int score) {
+void PlayScene::SaveScore(int score, const std::string& playerName) {
     // Get current time
     time_t now = time(0);
     struct tm tstruct;
@@ -411,7 +411,7 @@ void PlayScene::SaveScore(int score) {
     // Append the new score to the file
     std::ofstream file("scores.json", std::ios::app);
     if (file.is_open()) {
-        file << "Player" << ", " << score << ", " << MapId << ", " << buf << "\n";
+        file << playerName << ", " << score << ", " << MapId << ", " << buf << "\n";
         file.close();
     }
 }
