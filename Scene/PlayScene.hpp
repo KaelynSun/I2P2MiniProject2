@@ -80,7 +80,7 @@ public:
     void OnEnemyDefeated(Enemy* enemy);
     void ReadMap();
     void ReadEnemyWave();
-    void SaveScore(int score);
+    void SaveScore(int score, const std::string& playerName);
     void ConstructUI();
     void UIBtnClicked(int id);
     bool CheckSpaceValid(int x, int y);
