@@ -23,28 +23,24 @@ void ScoreboardScene::Initialize() {
     AddNewObject(new Engine::Label("scoreboard", "pirulen.ttf", 72, halfW, 60, 57, 255, 20, 255, 0.5, 0.5));
 
     // Display current page scores
+    // Display current page scores
+    int headerY = 150;
+    AddNewObject(new Engine::Label("Rank", "pirulen.ttf", 28, halfW - 500, headerY, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Name", "pirulen.ttf", 28, halfW - 250, headerY, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Stage", "pirulen.ttf", 28, halfW, headerY, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Score", "pirulen.ttf", 28, halfW + 250, headerY, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Time", "pirulen.ttf", 28, halfW + 550, headerY, 255, 255, 255, 255, 0.5, 0.5));
+
     int startIdx = currentPage * entriesPerPage;
-    for (int i = 0; i < entriesPerPage && startIdx + i < scores.size(); i++) {
-        const auto& entry = scores[startIdx + i];
-        int yPos = 150 + i * 60;
-        
-        // Rank
-        AddNewObject(new Engine::Label(
-            std::to_string(startIdx + i + 1) + ".", 
-            "pirulen.ttf", 36, halfW - 250, yPos, 255, 255, 255, 255
-        ));
-        
-        // Player name and details
-        std::string details = entry.playerName + " - Stage " + std::to_string(entry.stage) + 
-                             " - " + entry.timestamp;
-        AddNewObject(new Engine::Label(
-            details, "pirulen.ttf", 24, halfW - 100, yPos, 255, 255, 255, 255
-        ));
-        
-        // Score
-        AddNewObject(new Engine::Label(
-            std::to_string(entry.score), "pirulen.ttf", 36, halfW + 250, yPos, 255, 215, 0, 255
-        ));
+    for(int i = 0; i < entriesPerPage && startIdx + i < scores.size(); i++){
+        const auto &entry = scores[startIdx + i];
+        int yPos = 200 + i * 60;
+
+        AddNewObject(new Engine::Label(std::to_string(startIdx + i + 1), "pirulen.ttf", 24, halfW - 500, yPos, 255, 255, 255, 255));
+        AddNewObject(new Engine::Label(entry.playerName, "pirulen.ttf", 24, halfW - 315, yPos, 255, 255, 255, 255));
+        AddNewObject(new Engine::Label(std::to_string(entry.stage), "pirulen.ttf", 24, halfW, yPos, 255, 255, 255, 255));
+        AddNewObject(new Engine::Label(std::to_string(entry.score), "pirulen.ttf", 24, halfW + 200, yPos, 255, 215, 0, 255));
+        AddNewObject(new Engine::Label(entry.timestamp, "pirulen.ttf", 24, halfW + 400, yPos, 200, 200, 200, 255));
     }
 
     // Navigation buttons
