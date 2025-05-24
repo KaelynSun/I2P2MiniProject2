@@ -12,6 +12,7 @@
 #include "Enemy/SoldierEnemy.hpp"
 #include "Enemy/PlaneEnemy.hpp"
 #include "Enemy/TankEnemy.hpp"
+#include "Enemy/SupportEnemy.hpp"
 #include "Engine/AudioHelper.hpp"
 #include "Engine/GameEngine.hpp"
 #include "Engine/Group.hpp"
@@ -20,6 +21,7 @@
 #include "PlayScene.hpp"
 #include "Turret/LaserTurret.hpp"
 #include "Turret/MachineGunTurret.hpp"
+#include "Turret/PierceTurret.hpp"
 #include "Turret/TurretButton.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "UI/Animation/Plane.hpp"
@@ -43,6 +45,13 @@ const std::vector<int> PlayScene::code = { //CHEAT CODE SEQUENCE HERE
     ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT,
     ALLEGRO_KEY_B, ALLEGRO_KEY_A, ALLEGRO_KEY_LSHIFT, ALLEGRO_KEY_ENTER
 };
+
+static float CalculateDistance(Engine::Point p1, Engine::Point p2) {
+    float dx = p1.x - p2.x;
+    float dy = p1.y - p2.y;
+    return sqrt(dx*dx + dy*dy);
+}
+
 Engine::Point PlayScene::GetClientSize() {
     return Engine::Point(MapWidth * BlockSize, MapHeight * BlockSize);
 }
@@ -173,9 +182,33 @@ void PlayScene::Update(float deltaTime) {
             case 3:
                 EnemyGroup->AddNewObject(enemy = new TankEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
                 break;
+            case 4:
+                EnemyGroup->AddNewObject(enemy = new SupportEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+                break;
             default:
                 continue;
         }
+
+        for (auto& obj : EnemyGroup->GetObjects()) {
+            Enemy* enemy = dynamic_cast<Enemy*>(obj);
+            if (enemy && enemy->type == "Support") {
+                // This is a SupportEnemy, buff nearby allies
+                for (auto& obj2 : EnemyGroup->GetObjects()) {
+                    Enemy* ally = dynamic_cast<Enemy*>(obj2);
+                    if (ally && ally != enemy && ally->type != "Support") {
+                        float distance = CalculateDistance(enemy->Position, ally->Position);
+                        if (distance <= 200 && !ally->buffed) { // 200 is buff radius
+                            ally->setHP(ally->getHP() * 2); // Double the health
+                            ally->buffed = true;
+                            // Add visual effect
+                            EffectGroup->AddNewObject(new DirtyEffect("play/target.png", 1, 
+                                ally->Position.x, ally->Position.y));
+                        }
+                    }
+                }
+            }
+        }
+        
         enemy->UpdatePath(mapDistance);
         // Compensate the time lost.
         enemy->Update(ticks);
@@ -215,13 +248,32 @@ void PlayScene::OnMouseMove(int mx, int my) {
     IScene::OnMouseMove(mx, my);
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
-    if (!preview || x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
-        imgTarget->Visible = false;
-        return;
+    
+    // Hide both cursors by default
+    imgTarget->Visible = false;
+    imgShovel->Visible = false;
+    
+    if (x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
+        return; // Out of bounds - keep cursors hidden
     }
-    imgTarget->Visible = true;
-    imgTarget->Position.x = x * BlockSize;
-    imgTarget->Position.y = y * BlockSize;
+
+    if (shovelMode) {
+        imgShovel->Visible = true;
+    } 
+    else if (preview) {
+        imgTarget->Visible = true;
+    }
+    
+    if (shovelMode) { //Shovel cursor
+        imgShovel->Visible = true;
+        imgShovel->Position.x = x * BlockSize;
+        imgShovel->Position.y = y * BlockSize;
+    }
+    else if (preview) { //if we're not using shovel, use the regular cursor instead
+        imgTarget->Visible = true;
+        imgTarget->Position.x = x * BlockSize;
+        imgTarget->Position.y = y * BlockSize;
+    }
 }
 void PlayScene::OnMouseUp(int button, int mx, int my) {
     IScene::OnMouseUp(button, mx, my);
@@ -230,7 +282,32 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
     if (button & 1) {
-        if (mapState[y][x] != TILE_OCCUPIED) {
+        if (shovelMode) {
+            // Shovel mode - remove turret if one exists at this position
+            for (auto& it : TowerGroup->GetObjects()) {
+                Turret* turret = dynamic_cast<Turret*>(it);
+                if (turret) {
+                    int turretX = static_cast<int>(turret->Position.x) / BlockSize;
+                    int turretY = static_cast<int>(turret->Position.y) / BlockSize;
+                    if (turretX == x && turretY == y) {
+                        // Remove the turret
+                        TowerGroup->RemoveObject(it->GetObjectIterator());
+                        mapState[y][x] = TILE_FLOOR; // Mark the tile as unoccupied
+                        
+                        // Add some visual effect
+                        Engine::Sprite* sprite;
+                        GroundEffectGroup->AddNewObject(sprite = new DirtyEffect("play/target-invalid.png", 1, 
+                            x * BlockSize + BlockSize / 2, y * BlockSize + BlockSize / 2));
+                        sprite->Rotation = 0;
+                        
+                        shovelMode = false; // Exit shovel mode
+                        return;
+                    }
+                }
+            }
+            shovelMode = false; // Exit shovel mode if clicked on empty space
+        }
+        else if (mapState[y][x] != TILE_OCCUPIED) {
             if (!preview)
                 return;
             // Check if valid.
@@ -363,6 +440,10 @@ void PlayScene::OnEnemyDefeated(Enemy *enemy){
     if(enemy->type == "Tank"){
         AddScore(150);
     }
+
+    if(enemy->type == "Support"){
+        AddScore(200);
+    }
 }
 
 void PlayScene::AddScore(int points){
@@ -389,6 +470,18 @@ void PlayScene::ConstructUI() {
                            Engine::Sprite("play/tower-base.png", 1370, 136, 0, 0, 0, 0),
                            Engine::Sprite("play/turret-2.png", 1370, 136 - 8, 0, 0, 0, 0), 1370, 136, LaserTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
+    UIGroup->AddNewControlObject(btn);
+    //Button 3
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-3.png", 1446, 136 - 8, 0, 0, 0, 0), 1446, 136, PierceTurret::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
+    UIGroup->AddNewControlObject(btn);
+    //Button 4 (shovel)
+    btn = new TurretButton( "play/shovel.png", "play/shovel.png",
+        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));  // Use ID 3 for shovel
     UIGroup->AddNewControlObject(btn);
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
@@ -423,6 +516,13 @@ void PlayScene::UIBtnClicked(int id) {
         preview = new MachineGunTurret(0, 0);
     else if (id == 1 && money >= LaserTurret::Price)
         preview = new LaserTurret(0, 0);
+    else if (id == 2 && money >= PierceTurret::Price)
+        preview = new PierceTurret(0, 0);
+    else if (id == 3) {
+        preview = nullptr;
+        shovelMode = true;
+        return;
+    }
     if (!preview)
         return;
     preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
