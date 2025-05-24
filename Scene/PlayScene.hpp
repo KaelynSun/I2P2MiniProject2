@@ -81,6 +81,7 @@ public:
     void ReadMap();
     void ReadEnemyWave();
     void SaveScore(int score, const std::string& playerName);
+    void BuffNearbyAllies(Enemy* supportEnemy);
     void ConstructUI();
     void UIBtnClicked(int id);
     bool CheckSpaceValid(int x, int y);
