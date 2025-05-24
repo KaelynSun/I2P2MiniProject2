@@ -19,6 +19,8 @@ add_executable(2025_I2P2_TowerDefense
     Bullet/FireBullet.hpp
     Bullet/LaserBullet.cpp
     Bullet/LaserBullet.hpp
+    Bullet/PierceBullet.cpp
+    Bullet/PierceBullet.hpp
 
     # TODO HACKATHON-3 (3/3): Add the new enemy source files here [DONE]
     Enemy/Enemy.cpp
@@ -29,6 +31,8 @@ add_executable(2025_I2P2_TowerDefense
     Enemy/PlaneEnemy.hpp
     Enemy/TankEnemy.cpp
     Enemy/TankEnemy.hpp
+    Enemy/SupportEnemy.cpp
+    Enemy/SupportEnemy.hpp
 
     Engine/Allegro5Exception.cpp
     Engine/Allegro5Exception.hpp
@@ -75,6 +79,8 @@ add_executable(2025_I2P2_TowerDefense
     Turret/LaserTurret.hpp
     Turret/MachineGunTurret.cpp
     Turret/MachineGunTurret.hpp
+    Turret/PierceTurret.cpp
+    Turret/PierceTurret.hpp
     Turret/Turret.cpp
     Turret/Turret.hpp
     Turret/TurretButton.cpp
