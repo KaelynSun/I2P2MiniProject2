@@ -1,0 +1,290 @@
+[
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Bullet\\Bullet.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Bullet\\Bullet.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Bullet/Bullet.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Bullet/Bullet.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Bullet\\FireBullet.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Bullet\\FireBullet.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Bullet/FireBullet.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Bullet/FireBullet.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Bullet\\RocketBullet.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Bullet\\RocketBullet.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Bullet/RocketBullet.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Bullet/RocketBullet.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Bullet\\LaserBullet.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Bullet\\LaserBullet.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Bullet/LaserBullet.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Bullet/LaserBullet.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Bullet\\PierceBullet.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Bullet\\PierceBullet.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Bullet/PierceBullet.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Bullet/PierceBullet.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Enemy\\Enemy.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Enemy\\Enemy.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Enemy/Enemy.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Enemy/Enemy.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Enemy\\SoldierEnemy.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Enemy\\SoldierEnemy.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Enemy/SoldierEnemy.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Enemy/SoldierEnemy.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Enemy\\PlaneEnemy.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Enemy\\PlaneEnemy.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Enemy/PlaneEnemy.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Enemy/PlaneEnemy.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Enemy\\TankEnemy.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Enemy\\TankEnemy.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Enemy/TankEnemy.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Enemy/TankEnemy.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Enemy\\SupportEnemy.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Enemy\\SupportEnemy.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Enemy/SupportEnemy.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Enemy/SupportEnemy.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Allegro5Exception.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Allegro5Exception.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Allegro5Exception.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Allegro5Exception.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\AudioHelper.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\AudioHelper.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/AudioHelper.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/AudioHelper.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Collider.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Collider.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Collider.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Collider.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\GameEngine.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\GameEngine.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/GameEngine.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/GameEngine.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Group.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Group.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Group.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Group.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\IControl.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\IControl.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/IControl.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/IControl.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\IObject.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\IObject.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/IObject.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/IObject.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\IScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\IScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/IScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/IScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\LOG.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\LOG.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/LOG.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/LOG.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Point.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Point.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Point.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Point.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Resources.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Resources.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Resources.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Resources.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Engine\\Sprite.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Engine\\Sprite.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Engine/Sprite.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Engine/Sprite.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\LoseScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\LoseScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/LoseScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/LoseScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\PlayScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\PlayScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/PlayScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/PlayScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\StageSelectScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\StageSelectScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/StageSelectScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/StageSelectScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\StartScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\StartScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/StartScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/StartScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\WinScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\WinScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/WinScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/WinScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\SettingsScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\SettingsScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/SettingsScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/SettingsScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\ScoreBoardScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\ScoreBoardScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/ScoreBoardScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/ScoreBoardScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\ScoreBoardScene2.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\ScoreBoardScene2.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/ScoreBoardScene2.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/ScoreBoardScene2.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Scene\\InputDataScene.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Scene\\InputDataScene.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Scene/InputDataScene.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Scene/InputDataScene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Tools\\Shovel.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Tools\\Shovel.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Tools/Shovel.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Tools/Shovel.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Tools\\Landmine.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Tools\\Landmine.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Tools/Landmine.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Tools/Landmine.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\LaserTurret.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\LaserTurret.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/LaserTurret.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/LaserTurret.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\MachineGunTurret.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\MachineGunTurret.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/MachineGunTurret.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/MachineGunTurret.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\RocketTurret.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\RocketTurret.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/RocketTurret.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/RocketTurret.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\PierceTurret.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\PierceTurret.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/PierceTurret.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/PierceTurret.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\Turret.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\Turret.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/Turret.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/Turret.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\Turret\\TurretButton.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\Turret\\TurretButton.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/Turret/TurretButton.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/Turret/TurretButton.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Animation\\DirtyEffect.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Animation\\DirtyEffect.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Animation/DirtyEffect.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Animation/DirtyEffect.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Animation\\ExplosionEffect.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Animation\\ExplosionEffect.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Animation/ExplosionEffect.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Animation/ExplosionEffect.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Animation\\BigExplosionEffect.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Animation\\BigExplosionEffect.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Animation/BigExplosionEffect.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Animation/BigExplosionEffect.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Animation\\Plane.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Animation\\Plane.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Animation/Plane.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Animation/Plane.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Component\\Image.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Component\\Image.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Component/Image.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Component/Image.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Component\\ImageButton.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Component\\ImageButton.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Component/ImageButton.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Component/ImageButton.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Component\\Label.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Component\\Label.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Component/Label.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Component/Label.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\UI\\Component\\Slider.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\UI\\Component\\Slider.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/UI/Component/Slider.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/UI/Component/Slider.cpp.obj"
+},
+{
+  "directory": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/build",
+  "command": "C:\\Users\\Felice\\Downloads\\llvm-mingw-20240417-msvcrt-x86_64\\llvm-mingw-20240417-msvcrt-x86_64\\bin\\clang++.exe  @CMakeFiles/2025_I2P2_TowerDefense.dir/includes_CXX.rsp -g -o CMakeFiles\\2025_I2P2_TowerDefense.dir\\main.cpp.obj -c C:\\Users\\Felice\\Downloads\\Felice-TowerDefense-main\\TowerDefense-main\\main.cpp",
+  "file": "C:/Users/Felice/Downloads/Felice-TowerDefense-main/TowerDefense-main/main.cpp",
+  "output": "CMakeFiles/2025_I2P2_TowerDefense.dir/main.cpp.obj"
+}
+]
