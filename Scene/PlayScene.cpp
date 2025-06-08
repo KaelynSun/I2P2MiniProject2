@@ -72,7 +72,7 @@ void PlayScene::Initialize() {
     currentWave = 0;
     waveTimer = 0;
     constructionTimer = ConstructionTime; // Set to 60 seconds
-    postWaveDelayTimer = 3.0f; // Initialize post wave delay timer to 3 seconds
+    postWaveDelayTimer = 0.0f; // Initialize post wave delay timer
 
     // Add groups from bottom to top.
     AddNewObject(TileMapGroup = new Group());
@@ -144,7 +144,6 @@ void PlayScene::Update(float deltaTime) {
 
             // Check if wave is complete (all enemies spawned and no enemies left)
             if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
-                if(postWaveDelayTimer <= 0.0f) {}
                 currentWave++;
                 // Always go to construction phase, even after last wave
                 currentPhase = GamePhase::CONSTRUCTION;
