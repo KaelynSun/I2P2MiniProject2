@@ -8,6 +8,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <sstream> // <-- Add this for std::istringstream
 
 #include "Enemy/Enemy.hpp"
 #include "Enemy/SoldierEnemy.hpp"
@@ -44,6 +45,7 @@ const std::vector<Engine::Point> PlayScene::directions = { Engine::Point(-1, 0),
 const int PlayScene::MapWidth = 20, PlayScene::MapHeight = 13;
 const int PlayScene::BlockSize = 64;
 const float PlayScene::DangerTime = 7.61;
+const float PlayScene::ConstructionTime = 60.0f; // <-- Added this line
 const Engine::Point PlayScene::SpawnGridPoint = Engine::Point(-1, 0);
 const Engine::Point PlayScene::EndGridPoint = Engine::Point(MapWidth, MapHeight - 1);
 const std::vector<int> PlayScene::code = { // CHEAT CODE SEQUENCE IS HERE!!!
@@ -63,6 +65,15 @@ void PlayScene::Initialize() {
     money = 150;
     SpeedMult = 1;
     enemiesKilled = 0;
+    gameStarted = false; // Reset gameStarted flag on initialization
+
+    // Construction
+    currentPhase = GamePhase::CONSTRUCTION;
+    currentWave = 0;
+    waveTimer = 0;
+    constructionTimer = ConstructionTime; // Set to 60 seconds
+    postWaveDelayTimer = 3.0f; // Initialize post wave delay timer to 3 seconds
+
     // Add groups from bottom to top.
     AddNewObject(TileMapGroup = new Group());
     AddNewObject(GroundEffectGroup = new Group());
@@ -76,6 +87,12 @@ void PlayScene::Initialize() {
     AddNewControlObject(UIGroup = new Group());
     ReadMap();
     ReadEnemyWave();
+    // Only put the first round's enemies in the queue
+    if (!allEnemyWaves.empty()) {
+        enemyWaveData = allEnemyWaves[0];
+    } else {
+        enemyWaveData.clear();
+    }
     mapDistance = CalculateBFSDistance();
     ConstructUI();
     imgTarget = new Engine::Image("play/target.png", 0, 0);
@@ -95,9 +112,70 @@ void PlayScene::Terminate() {
     IScene::Terminate();
 }
 void PlayScene::Update(float deltaTime) {
-    if (paused) return; // Skip update when paused
+    if (paused) return;
     // If we use deltaTime directly, then we might have Bullet-through-paper problem.
     // Reference: Bullet-Through-Paper
+    // Construction
+    // Handle game phases
+        if (currentPhase == GamePhase::CONSTRUCTION) {
+            constructionTimer -= deltaTime;
+            if (constructionTimer < 0) constructionTimer = 0;
+            // Update label
+            int secondsLeft = static_cast<int>(ceil(constructionTimer));
+            int minutes = secondsLeft / 60;
+            int seconds = secondsLeft % 60;
+            char buffer[32];
+            snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+            constructionTimerLabel->Text = buffer;
+            // Only go to win scene if all rounds are done AND this is the final construction phase (after all waves)
+            if (constructionTimer <= 0) {
+                if (currentWave >= 4) { // Ensure win only after 4 rounds
+                    Engine::GameEngine::GetInstance().ChangeScene("win");
+                    return;
+                }
+                // Only put the current round's enemies in the queue at the start of each wave
+                enemyWaveData = allEnemyWaves[currentWave];
+                currentPhase = GamePhase::WAVE;
+                constructionTimerLabel->Text = "";
+            }
+        }
+        else { // WAVE phase
+            waveTimer += deltaTime;
+
+            // Check if wave is complete (all enemies spawned and no enemies left)
+            if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
+                if(postWaveDelayTimer <= 0.0f) {}
+                currentWave++;
+                // Always go to construction phase, even after last wave
+                currentPhase = GamePhase::CONSTRUCTION;
+                constructionTimer = ConstructionTime;
+                // Reset construction timer label text for new construction phase
+                if (constructionTimerLabel) {
+                    int secondsLeft = static_cast<int>(ceil(constructionTimer));
+                    int minutes = secondsLeft / 60;
+                    int seconds = secondsLeft % 60;
+                    char buffer[32];
+                    snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+                    constructionTimerLabel->Text = buffer;
+                }
+            }
+        }
+
+    // Update phase indicator UI
+    if (currentPhase == GamePhase::CONSTRUCTION && constructionTimerLabel) {
+        int secondsLeft = static_cast<int>(ceil(constructionTimer));
+        int minutes = secondsLeft / 60;
+        int seconds = secondsLeft % 60;
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "Construction Phase %d:%02d", minutes, seconds);
+        constructionTimerLabel->Text = buffer;
+    }
+    else if (controlsLabel) {
+        // Show 1-based round number for UI
+        int displayWave = std::min(currentWave + 1, 4); // Show max 4 waves
+        controlsLabel->Text = "WAVE " + std::to_string(displayWave) + "/4";
+    }
+
     if (SpeedMult == 0)
         deathCountDown = -1;
     else if (deathCountDown != -1)
@@ -107,112 +185,132 @@ void PlayScene::Update(float deltaTime) {
     for (auto &it : EnemyGroup->GetObjects()) {
         reachEndTimes.push_back(dynamic_cast<Enemy *>(it)->reachEndTime);
     }
-    // Can use Heap / Priority-Queue instead. But since we won't have too many enemies, sorting is fast enough.
-    std::sort(reachEndTimes.begin(), reachEndTimes.end());
-    float newDeathCountDown = -1;
-    int danger = lives;
-    for (auto &it : reachEndTimes) {
-        if (it <= DangerTime) {
-            danger--;
-            if (danger <= 0) {
-                // Death Countdown
-                float pos = DangerTime - it;
-                if (it > deathCountDown) {
-                    // Restart Death Count Down BGM.
-                    AudioHelper::StopSample(deathBGMInstance);
-                    if (SpeedMult != 0)
-                        deathBGMInstance = AudioHelper::PlaySample("astronomia.ogg", false, AudioHelper::BGMVolume, pos);
-                }
-                float alpha = pos / DangerTime;
-                alpha = std::max(0, std::min(255, static_cast<int>(alpha * alpha * 255)));
-                dangerIndicator->Tint = al_map_rgba(255, 255, 255, alpha);
-                newDeathCountDown = it;
-                break;
-            }
-        }
-    }
-    deathCountDown = newDeathCountDown;
-    if (SpeedMult == 0)
-        AudioHelper::StopSample(deathBGMInstance);
-    if (deathCountDown == -1 && lives > 0) {
-        AudioHelper::StopSample(deathBGMInstance);
-        dangerIndicator->Tint.a = 0;
-    }
-    if (SpeedMult == 0)
-        deathCountDown = -1;
-    for (int i = 0; i < SpeedMult; i++) {
-        IScene::Update(deltaTime);
-        // Check if we should create new enemy.
-        ticks += deltaTime;
-        // TODO HACKATHON-5 (1/4)
-        //bool changeScenePls = false;
-        if (enemyWaveData.empty()) {
-            if (EnemyGroup->GetObjects().empty()) {
-                // Free resources.
-                /*delete TileMapGroup;
-                delete GroundEffectGroup;
-                delete DebugIndicatorGroup;
-                delete TowerGroup;
-                delete EnemyGroup;
-                delete BulletGroup;
-                delete EffectGroup;
-                delete UIGroup;
-                delete imgTarget;*/
-                // Win
-                Engine::GameEngine::GetInstance().ChangeScene("win");
-                return;
-            }
-            continue;
-        }
-        auto current = enemyWaveData.front();
-        if (ticks < current.second)
-            continue;
-        ticks -= current.second;
-        enemyWaveData.pop_front();
-        const Engine::Point SpawnCoordinate = Engine::Point(SpawnGridPoint.x * BlockSize + BlockSize / 2, SpawnGridPoint.y * BlockSize + BlockSize / 2);
-        Enemy *enemy;
-        switch (current.first) {
-            case 1:
-                EnemyGroup->AddNewObject(enemy = new SoldierEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
-                break;
-            // TODO HACKATHON-3 (2/3): Add your new enemy here.
-            case 2:
-                EnemyGroup->AddNewObject(enemy = new PlaneEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
-                break;
-            case 3:
-                EnemyGroup->AddNewObject(enemy = new TankEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
-                break;
-             case 4:
-                EnemyGroup->AddNewObject(enemy = new SupportEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
-                break;
-            default:
-                continue;
-        }
 
-        for (auto& obj : EnemyGroup->GetObjects()) {
-            Enemy* enemy = dynamic_cast<Enemy*>(obj);
-            if (enemy && enemy->type == "Support") {
-                // This is a SupportEnemy, buff nearby allies
-                for (auto& obj2 : EnemyGroup->GetObjects()) {
-                    Enemy* ally = dynamic_cast<Enemy*>(obj2);
-                    if (ally && ally != enemy && ally->type != "Support") {
-                        float distance = CalculateDistance(enemy->Position, ally->Position);
-                        if (distance <= 200 && !ally->buffed) { // 200 is buff radius
-                            ally->setHP(ally->getHP() * 2); // Double the health
-                            ally->buffed = true;
-                            // Add visual effect
-                            EffectGroup->AddNewObject(new DirtyEffect("play/target.png", 1, 
-                                ally->Position.x, ally->Position.y));
+    if (currentPhase == GamePhase::WAVE) {
+        // Can use Heap / Priority-Queue instead. But since we won't have too many enemies, sorting is fast enough.
+        std::sort(reachEndTimes.begin(), reachEndTimes.end());
+        float newDeathCountDown = -1;
+        int danger = lives;
+        for (auto &it : reachEndTimes) {
+            if (it <= DangerTime) {
+                danger--;
+                if (danger <= 0) {
+                    // Death Countdown
+                    float pos = DangerTime - it;
+                    if (it > deathCountDown) {
+                        // Restart Death Count Down BGM.
+                        AudioHelper::StopSample(deathBGMInstance);
+                        if (SpeedMult != 0)
+                            deathBGMInstance = AudioHelper::PlaySample("astronomia.ogg", false, AudioHelper::BGMVolume, pos);
+                    }
+                    float alpha = pos / DangerTime;
+                    alpha = std::max(0, std::min(255, static_cast<int>(alpha * alpha * 255)));
+                    dangerIndicator->Tint = al_map_rgba(255, 255, 255, alpha);
+                    newDeathCountDown = it;
+                    break;
+                }
+            }
+        }
+        deathCountDown = newDeathCountDown;
+        if (SpeedMult == 0)
+            AudioHelper::StopSample(deathBGMInstance);
+        if (deathCountDown == -1 && lives > 0) {
+            AudioHelper::StopSample(deathBGMInstance);
+            dangerIndicator->Tint.a = 0;
+        }
+        if (SpeedMult == 0)
+            deathCountDown = -1;
+        for (int i = 0; i < SpeedMult; i++) {
+            IScene::Update(deltaTime);
+            // Check if we should create new enemy.
+            ticks += deltaTime;
+            // TODO HACKATHON-5 (1/4)
+            //bool changeScenePls = false;
+            if (enemyWaveData.empty()) {
+                if (EnemyGroup->GetObjects().empty()) {
+                    // Only go to win scene if all waves are done (currentWave >= 4)
+                    if (currentWave >= 4) {
+                        Engine::GameEngine::GetInstance().ChangeScene("win");
+                        return;
+                    }
+                    // Wait for death countdown to finish before starting construction phase
+                    if (deathCountDown != -1) {
+                        // Still in death animation/countdown, delay transition
+                        continue;
+                    }
+                    // Wait for 1 second delay after wave ends before construction phase
+                    if (postWaveDelayTimer > 0.0f) {
+                        postWaveDelayTimer -= deltaTime;
+                        continue;
+                    }
+                    // Transition to construction phase
+                    currentWave++;
+                    currentPhase = GamePhase::CONSTRUCTION;
+                    constructionTimer = ConstructionTime;
+                    postWaveDelayTimer = 1.0f; // Reset delay timer for next wave
+                    // Reset construction timer label text for new construction phase
+                    if (constructionTimerLabel) {
+                        int secondsLeft = static_cast<int>(ceil(constructionTimer));
+                        int minutes = secondsLeft / 60;
+                        int seconds = secondsLeft % 60;
+                        char buffer[32];
+                        snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+                        constructionTimerLabel->Text = buffer;
+                    }
+                }
+                continue;
+            }
+            auto current = enemyWaveData.front();
+            if (ticks < current.second)
+                continue;
+            ticks -= current.second;
+            enemyWaveData.pop_front();
+            const Engine::Point SpawnCoordinate = Engine::Point(SpawnGridPoint.x * BlockSize + BlockSize / 2, SpawnGridPoint.y * BlockSize + BlockSize / 2);
+            Enemy *enemy;
+            switch (current.first) {
+                case 1:
+                    EnemyGroup->AddNewObject(enemy = new SoldierEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+                    break;
+                // TODO HACKATHON-3 (2/3): Add your new enemy here.
+                case 2:
+                    EnemyGroup->AddNewObject(enemy = new PlaneEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+                    break;
+                case 3:
+                    EnemyGroup->AddNewObject(enemy = new TankEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+                    break;
+                case 4:
+                    EnemyGroup->AddNewObject(enemy = new SupportEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+                    break;
+                default:
+                    continue;
+            }
+
+            for (auto& obj : EnemyGroup->GetObjects()) {
+                Enemy* enemy = dynamic_cast<Enemy*>(obj);
+                if (enemy && enemy->type == "Support") {
+                    // This is a SupportEnemy, buff nearby allies
+                    for (auto& obj2 : EnemyGroup->GetObjects()) {
+                        Enemy* ally = dynamic_cast<Enemy*>(obj2);
+                        if (ally && ally != enemy && ally->type != "Support") {
+                            float distance = CalculateDistance(enemy->Position, ally->Position);
+                            if (distance <= 200 && !ally->buffed) { // 200 is buff radius
+                                ally->setHP(ally->getHP() * 2); // Double the health
+                                ally->buffed = true;
+                                // Add visual effect
+                                EffectGroup->AddNewObject(new DirtyEffect("play/target.png", 1, 
+                                    ally->Position.x, ally->Position.y));
+                            }
                         }
                     }
                 }
             }
-        }
 
-        enemy->UpdatePath(mapDistance);
-        // Compensate the time lost.
-        enemy->Update(ticks);
+            enemy->UpdatePath(mapDistance);
+            // Compensate the time lost.
+            enemy->Update(ticks);
+        }
     }
+    
     if (preview) {
         preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
         // To keep responding when paused.
@@ -273,6 +371,7 @@ void PlayScene::OnMouseMove(int mx, int my) {
 }
 void PlayScene::OnMouseUp(int button, int mx, int my) {
     if (paused) return;
+    if(currentPhase != GamePhase::CONSTRUCTION) return;
     IScene::OnMouseUp(button, mx, my);
     if (!imgTarget->Visible)
         return;
@@ -371,6 +470,21 @@ void PlayScene::OnKeyDown(int keyCode) {
         // Back to stage select
         Engine::GameEngine::GetInstance().ChangeScene("stage-select");
         paused = false;
+    }
+    else if (keyCode == ALLEGRO_KEY_S && !gameStarted) {
+        // Start the game when S is pressed
+        gameStarted = true;
+        currentPhase = GamePhase::CONSTRUCTION;
+
+        // Spawn an enemy immediately after pressing 's'
+        const Engine::Point SpawnCoordinate = Engine::Point(SpawnGridPoint.x * BlockSize + BlockSize / 2, SpawnGridPoint.y * BlockSize + BlockSize / 2);
+        Enemy* enemy = new SoldierEnemy(SpawnCoordinate.x, SpawnCoordinate.y);
+        EnemyGroup->AddNewObject(enemy);
+        enemy->UpdatePath(mapDistance);
+    }
+    else if (keyCode == ALLEGRO_KEY_S && currentPhase == GamePhase::CONSTRUCTION) {
+        // End construction phase early if 's' is pressed during construction
+        constructionTimer = 0;
     }
     else {
         keyStrokes.push_back(keyCode);
@@ -472,18 +586,49 @@ void PlayScene::ReadMap() {
     }
 }
 void PlayScene::ReadEnemyWave() {
-    std::string filename = std::string("Resource/enemy") + std::to_string(MapId) + ".txt";
-    // Read enemy file.
-    float type, wait, repeat;
+    allEnemyWaves.clear();
     enemyWaveData.clear();
-    std::ifstream fin(filename);
-    while (fin >> type && fin >> wait && fin >> repeat) {
-        for (int i = 0; i < repeat; i++)
-            enemyWaveData.emplace_back(type, wait);
+    // Read 4 files: enemy1-1.txt, enemy1-2.txt, enemy1-3.txt, enemy1-4.txt for MapId == 1
+    for (int round = 1; round <= 4; ++round) {
+        std::string filename = "Resource/enemy" + std::to_string(MapId) + "-" + std::to_string(round) + ".txt";
+        std::ifstream fin(filename);
+        std::string line;
+        std::deque<std::pair<int, float>> currentWave;
+        while (std::getline(fin, line)) {
+            // Remove leading/trailing whitespace
+            line.erase(0, line.find_first_not_of(" \t\r\n"));
+            line.erase(line.find_last_not_of(" \t\r\n") + 1);
+            if (line.empty()) continue;
+            std::istringstream iss(line);
+            int type;
+            float wait;
+            int repeat;
+            if (iss >> type >> wait >> repeat) {
+                for (int i = 0; i < repeat; i++)
+                    currentWave.emplace_back(type, wait);
+            }
+        }
+        fin.close();
+        allEnemyWaves.push_back(currentWave);
     }
-    fin.close();
+    // Only put the first round's enemies in the queue
+    if (!allEnemyWaves.empty()) {
+        enemyWaveData = allEnemyWaves[0];
+    } else {
+        enemyWaveData.clear();
+    }
 }
 void PlayScene::ConstructUI() {
+    // Construction Timer Label (top right)
+    int screenWidth = Engine::GameEngine::GetInstance().GetScreenSize().x;
+    constructionTimerLabel = new Engine::Label(
+        "Construction: 60", // Initial text
+        "pirulen.ttf", 32,
+        10, 10, // Top right corner, adjust as needed
+        255, 255, 0, 255, 0
+    );
+    UIGroup->AddNewObject(constructionTimerLabel);
+
     // Background
     UIGroup->AddNewObject(new Engine::Image("play/sand.png", 1280, 0, 320, 832));
     // Text
@@ -551,9 +696,14 @@ void PlayScene::ConstructUI() {
     dangerIndicator = new Engine::Sprite("play/benjamin.png", w - shift, h - shift);
     dangerIndicator->Tint.a = 0;
     UIGroup->AddNewObject(dangerIndicator);
+
+    // Construction phase
+    UIGroup->AddNewObject(controlsLabel = new Engine::Label("", "pirulen.ttf", 24, 1294, 128));
 }
 // Add turret
 void PlayScene::UIBtnClicked(int id) {
+    if (currentPhase != GamePhase::CONSTRUCTION) return;
+    
     Engine::Point mousePos = Engine::GameEngine::GetInstance().GetMousePosition();
     if (preview)
         UIGroup->RemoveObject(preview->GetObjectIterator());
@@ -649,3 +799,8 @@ std::vector<std::vector<int>> PlayScene::CalculateBFSDistance() {
 float PlayScene::CalculateDistance(const Engine::Point& p1, const Engine::Point& p2) {
     return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
+
+// Add these global/static variables if not already in PlayScene.hpp:
+std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
+std::deque<std::pair<int, float>> enemyWaveData;
+int currentWave = 0;

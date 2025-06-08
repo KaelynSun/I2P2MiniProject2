@@ -1,6 +1,7 @@
 #ifndef PLAYSCENE_HPP
 #define PLAYSCENE_HPP
 #include <allegro5/allegro_audio.h>
+#include <deque>
 #include <list>
 #include <memory>
 #include <utility>
@@ -36,6 +37,21 @@ protected:
     int SpeedMult;
 
 public:
+    // Construction phase
+    enum class GamePhase { CONSTRUCTION, WAVE };
+    bool gameStarted = false;
+    GamePhase currentPhase;
+    int currentWave;
+    float waveTimer;
+    float constructionTimer;
+    float postWaveDelayTimer; // New timer for delay after wave ends
+    static const float ConstructionTime; // 10 seconds construction phase
+    // const float WaveInterval = 5.0f; // 5 seconds between waves
+    
+    // Enemy wave data
+    std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
+    std::deque<std::pair<int, float>> enemyWaveData;
+
     int enemiesKilled = 0;
     static bool DebugMode;
     static bool paused;
@@ -61,12 +77,12 @@ public:
     Engine::Label *UIMoney;
     Engine::Label *UILives;
     Engine::Label* controlsLabel;
+    Engine::Label* constructionTimerLabel; // Label for construction timer countdown
     Engine::Image *imgTarget;
     Engine::Sprite *dangerIndicator;
     Turret *preview; // Pointer to turret
     std::vector<std::vector<TileType>> mapState;
     std::vector<std::vector<int>> mapDistance;
-    std::list<std::pair<int, float>> enemyWaveData;
     std::list<int> keyStrokes;
     static Engine::Point GetClientSize();
     explicit PlayScene() = default;
