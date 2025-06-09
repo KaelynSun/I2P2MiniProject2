@@ -87,6 +87,8 @@ add_executable(2025_I2P2_TowerDefense
     Turret/PierceTurret.hpp
     Turret/RocketTurret.cpp
     Turret/RocketTurret.hpp
+    Turret/Landmine.cpp
+    Turret/Landmine.hpp
     Turret/Turret.cpp
     Turret/Turret.hpp
     Turret/TurretButton.cpp
