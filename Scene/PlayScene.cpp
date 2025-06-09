@@ -19,14 +19,17 @@
 #include "Engine/LOG.hpp"
 #include "Engine/Resources.hpp"
 #include "PlayScene.hpp"
+#include "WinScene.hpp"
 #include "Turret/LaserTurret.hpp"
 #include "Turret/MachineGunTurret.hpp"
 #include "Turret/PierceTurret.hpp"
-#include "Turret/RocketTurret.
+#include "Turret/RocketTurret.hpp"
 #include "Turret/TurretButton.hpp"
+#include "Turret/Landmine.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "UI/Animation/Plane.hpp"
 #include "UI/Component/Label.hpp"
+#include "LocalAccount.h"
 
 // TODO HACKATHON-4 (1/3): Trace how the game handles keyboard input. [DONE]
 // TODO HACKATHON-4 (2/3): Find the cheat code sequence in this file [DONE line 40]
@@ -62,7 +65,7 @@ void PlayScene::Initialize() {
     ticks = 0;
     deathCountDown = -1;
     lives = 10;
-    money = 150;
+    money = 500;
     SpeedMult = 1;
     // Add groups from bottom to top.
     AddNewObject(TileMapGroup = new Group());
@@ -79,9 +82,12 @@ void PlayScene::Initialize() {
     mapDistance = CalculateBFSDistance();
     ConstructUI();
     imgTarget = new Engine::Image("play/target.png", 0, 0);
+    imgShovel = new Engine::Image("play/shovel.png", 0,0);
     imgTarget->Visible = false;
+    imgShovel->Visible = false;
     preview = nullptr;
     UIGroup->AddNewObject(imgTarget);
+    UIGroup->AddNewObject(imgShovel);
     // Preload Lose Scene
     deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("astronomia.ogg");
     Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
@@ -94,6 +100,7 @@ void PlayScene::Terminate() {
     deathBGMInstance = std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE>();
     IScene::Terminate();
 }
+
 void PlayScene::Update(float deltaTime) {
     // If we use deltaTime directly, then we might have Bullet-through-paper problem.
     // Reference: Bullet-Through-Paper
@@ -156,10 +163,13 @@ void PlayScene::Update(float deltaTime) {
                 delete UIGroup;
                 delete imgTarget;*/
                 // Win.
+                accountManager.updateHighScore(totalScore);
 
-                int livesBonus = 200;
-                totalScore += 200;
-                SaveScore(totalScore);
+                auto *winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
+                if(winScene){
+                    winScene->SetFinalScore(totalScore);
+                    winScene->SetPlayerName(accountManager.getCurrentUsername());
+                }
                 Engine::GameEngine::GetInstance().ChangeScene("win");
                 return;
             }
@@ -209,7 +219,7 @@ void PlayScene::Update(float deltaTime) {
                 }
             }
         }
-        
+
         enemy->UpdatePath(mapDistance);
         // Compensate the time lost.
         enemy->Update(ticks);
@@ -278,13 +288,14 @@ void PlayScene::OnMouseMove(int mx, int my) {
 }
 void PlayScene::OnMouseUp(int button, int mx, int my) {
     IScene::OnMouseUp(button, mx, my);
-    if (!imgTarget->Visible)
+    if (!imgTarget->Visible && !imgShovel->Visible)
         return;
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
     if (button & 1) {
         if (shovelMode) {
             // Shovel mode - remove turret if one exists at this position
+            //iterates through the all the turrets
             for (auto& it : TowerGroup->GetObjects()) {
                 Turret* turret = dynamic_cast<Turret*>(it);
                 if (turret) {
@@ -308,33 +319,27 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
             }
             shovelMode = false; // Exit shovel mode if clicked on empty space
         }
-        else if (mapState[y][x] != TILE_OCCUPIED) {
+        else if (mapState[y][x] != TILE_OCCUPIED || dynamic_cast<Landmine*>(preview)) {
+            // Original turret placement code
             if (!preview)
                 return;
-            // Check if valid.
             if (!CheckSpaceValid(x, y)) {
-                Engine::Sprite *sprite;
+                Engine::Sprite* sprite;
                 GroundEffectGroup->AddNewObject(sprite = new DirtyEffect("play/target-invalid.png", 1, x * BlockSize + BlockSize / 2, y * BlockSize + BlockSize / 2));
                 sprite->Rotation = 0;
                 return;
             }
-            // Purchase.
             EarnMoney(-preview->GetPrice());
-            // Remove Preview.
             preview->GetObjectIterator()->first = false;
             UIGroup->RemoveObject(preview->GetObjectIterator());
-            // Construct real turret.
             preview->Position.x = x * BlockSize + BlockSize / 2;
             preview->Position.y = y * BlockSize + BlockSize / 2;
             preview->Enabled = true;
             preview->Preview = false;
             preview->Tint = al_map_rgba(255, 255, 255, 255);
             TowerGroup->AddNewObject(preview);
-            // To keep responding when paused.
             preview->Update(0);
-            // Remove Preview.
             preview = nullptr;
-
             mapState[y][x] = TILE_OCCUPIED;
             OnMouseMove(mx, my);
         }
@@ -490,6 +495,12 @@ void PlayScene::ConstructUI() {
         Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
     UIGroup->AddNewControlObject(btn);
+    //Button 6 (landmine)
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+        Engine::Sprite("play/tower-base.png", 1370, 200, 0, 0, 0, 0),
+        Engine::Sprite("play/landmine.png", 1370, 200 - 8, 0, 0, 0, 0), 1370, 200, Landmine::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5)); // Use IF 5 for shovel
+    UIGroup->AddNewControlObject(btn);
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
@@ -502,11 +513,11 @@ void PlayScene::ConstructUI() {
 // In PlayScene.cpp when player wins:
 void PlayScene::SaveScore(int score, const std::string& playerName) {
     // Get current time
-    time_t now = time(0);
-    struct tm tstruct;
-    char buf[80];
-    tstruct = *localtime(&now);
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    time_t now = time(0); // asks for the time, asks the seconds since Jan 1, 1970 and stores in now
+    struct tm tstruct; //creates a container struct called tstruct
+    char buf[80]; //creates a character array who's length is 80 character
+    tstruct = *localtime(&now); // takes the giant number stored in now and put it in the struct
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct); //strftime means stringformattime
 
     // Append the new score to the file
     std::ofstream file("scores.json", std::ios::app);
@@ -532,6 +543,8 @@ void PlayScene::UIBtnClicked(int id) {
         shovelMode = true;
         return;
     }
+    else if (id == 5 && money >= Landmine::Price)
+        preview = new Landmine(0, 0);
     if (!preview)
         return;
     preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
@@ -545,6 +558,11 @@ void PlayScene::UIBtnClicked(int id) {
 bool PlayScene::CheckSpaceValid(int x, int y) {
     if (x < 0 || x >= MapWidth || y < 0 || y >= MapHeight)
         return false;
+
+    if (dynamic_cast<Landmine*>(preview)) {
+        return mapState[y][x] == TILE_DIRT;
+    }
+    
     auto map00 = mapState[y][x];
     mapState[y][x] = TILE_OCCUPIED;
     std::vector<std::vector<int>> map = CalculateBFSDistance();
