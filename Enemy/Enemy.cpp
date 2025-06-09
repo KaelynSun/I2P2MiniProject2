@@ -35,7 +35,7 @@ Enemy::Enemy(std::string img, float x, float y, float radius, float speed, float
     CollisionRadius = radius;
     reachEndTime = 0;
 }
-void Enemy::Hit(float damage) {
+void Enemy::Hit(float damage, bool isAOE) {
     hp -= damage;
     if (hp <= 0) {
         OnExplode();
@@ -44,6 +44,8 @@ void Enemy::Hit(float damage) {
             it->Target = nullptr;
         for (auto &it : lockedBullets)
             it->Target = nullptr;
+
+        getPlayScene()->OnEnemyDefeated(this);
         getPlayScene()->EarnMoney(money);
         getPlayScene()->EnemyGroup->RemoveObject(objectIterator);
         AudioHelper::PlayAudio("explosion.wav");
@@ -88,7 +90,7 @@ void Enemy::Update(float deltaTime) {
     while (remainSpeed != 0) {
         if (path.empty()) {
             // Reach end point.
-            Hit(hp);
+            Hit(hp, false);
             getPlayScene()->Hit();
             reachEndTime = 0;
             return;
