@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <deque>
 
 #include "Engine/IScene.hpp"
 #include "Engine/Point.hpp"
@@ -39,7 +40,34 @@ protected:
     int SpeedMult;
 
 public:
+    // Construction phase
+    enum class GamePhase { CONSTRUCTION, WAVE };
+    bool gameStarted = false;
+    GamePhase currentPhase;
+    int currentWave;
+    float waveTimer;
+    float constructionTimer;
+    float postWaveDelayTimer; // New timer for delay after wave ends
+    static const float ConstructionTime; // 10 seconds construction phase
+    // const float WaveInterval = 5.0f; // 5 seconds between waves
+    
+    // Enemy wave data
+    std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
+
+    // Turret stats
+    void ShowUpgradeUI(int turretType);
+    static int machineGunUpgradeLevel;
+    static int laserUpgradeLevel;
+    static int rocketUpgradeLevel;
+    static int pierceUpgradeLevel;
+    static float machineGunDamageMultiplier;
+    static float laserDamageMultiplier;
+    static float rocketDamageMultiplier;
+    static float pierceDamageMultiplier;
+
+    int enemiesKilled;
     static bool DebugMode;
+    static bool paused;
     static const std::vector<Engine::Point> directions;
     static const int MapWidth, MapHeight;
     static const int BlockSize;
@@ -61,13 +89,17 @@ public:
     Group *UIGroup;
     Engine::Label *UIMoney;
     Engine::Label *UILives;
+
+    Engine::Label* controlsLabel;
+    Engine::Label* constructionTimerLabel; // Label for construction timer countdown
+
     Engine::Image *imgTarget;
     Engine::Image *imgShovel;
     Engine::Sprite *dangerIndicator;
     Turret *preview;
     std::vector<std::vector<TileType>> mapState;
     std::vector<std::vector<int>> mapDistance;
-    std::list<std::pair<int, float>> enemyWaveData;
+    std::deque<std::pair<int, float>> enemyWaveData;
     std::list<int> keyStrokes;
     static Engine::Point GetClientSize();
     explicit PlayScene() = default;
@@ -92,6 +124,7 @@ public:
     void UIBtnClicked(int id);
     bool CheckSpaceValid(int x, int y);
     std::vector<std::vector<int>> CalculateBFSDistance();
+    static float CalculateDistance(const Engine::Point& p1, const Engine::Point& p2);
     // void ModifyReadMapTiles();
 };
 #endif   // PLAYSCENE_HPP
