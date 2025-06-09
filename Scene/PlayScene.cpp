@@ -160,6 +160,21 @@ void PlayScene::Update(float deltaTime) {
 
             // Check if wave is complete (all enemies spawned and no enemies left)
             if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
+                if (currentWave >= 3) {
+                    // Update high score before switching scene
+                    accountManager.updateHighScore(totalScore);
+
+                    // Pass score and name to WinScene
+                    auto* winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
+                    if (winScene) {
+                        winScene->SetFinalScore(totalScore);
+                        winScene->SetPlayerName(accountManager.getCurrentUsername());
+                    }
+
+                    // Change to win scene
+                    Engine::GameEngine::GetInstance().ChangeScene("win");
+                    return;
+                }
                 currentWave++;
                 // Always go to construction phase, even after last wave
                 currentPhase = GamePhase::CONSTRUCTION;
@@ -351,7 +366,7 @@ void PlayScene::Draw() const {
         int boxX = 1300;
         int boxY = 300;
         int boxW = 280;
-        int boxH = 130;
+        int boxH = 150;
 
         al_draw_filled_rounded_rectangle(boxX, boxY, boxX + boxW, boxY + boxH,
                                         10, 10, al_map_rgba(0, 0, 0, 80)); // semi-transparent black
@@ -390,123 +405,159 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
     if (paused) return;
     // Right click on turret button: show info
     if ((button & 2)) {
+        // First, remove any existing turret info labels
+        ClearTurretInfo();
+        
         // Check if mouse is over a turret button
-        struct TurretBtnInfo {
-            int x, y, w, h;
-            std::string name;
-            int atk, hp;
-        };
         std::vector<TurretBtnInfo> btns = {
-            {1294, 136, 64, 64, "Machine Gun Turret", 20, 100},
-            {1370, 136, 64, 64, "Laser Turret", 40, 80},
-            {1446, 136, 64, 64, "Rocket Turret", 60, 120},
-            {1522, 136, 64, 64, "Pierce Turret", 30, 90},
-            {1294, 215, 64, 64, "Shovel", 0, 0},
-            {1370, 215, 64, 64, "Landmine", 100, 1},
+            {1294, 136, 64, 64, "Machine Gun Turret", 20, 100, ""},
+            {1370, 136, 64, 64, "Laser Turret", 40, 80, ""},
+            {1446, 136, 64, 64, "Rocket Turret", 60, 120, ""},
+            {1522, 136, 64, 64, "Pierce Turret", 30, 90, ""},
+            {1294, 215, 64, 64, "Shovel", 0, 0, ""},
+            {1370, 215, 64, 64, "Landmine", 100, 1, ""},
         };
-        bool ClickedOnButton = false;
         for (const auto& btn : btns) {
             if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
-                // Remove previous label if exists
-                ClickedOnButton = true;
-                if (turretInfoLabel) {
-                    // Defensive: check if label is still in UIGroup before removing
-                    auto iter = turretInfoLabel->GetObjectIterator();
-                    if (iter->first) {
-                        UIGroup->RemoveObject(iter);
-                        turretInfoLabelInUI = false;
-                    }
-                    delete turretInfoLabel;
-                    turretInfoLabel = nullptr;
-                }
-                int xStart = 1310;
-                int yStart = 310;
-                UIGroup->AddNewObject(turretInfoLabel = new Engine::Label(btn.name, "pirulen.ttf", 16, 
-                                                          xStart, yStart, 0, 0, 0, 255, 0));
-                turretInfoLabelInUI = true;
+                ShowTurretInfo(btn, mx, my);
+                return; // Exit after finding the clicked button
+            }
+        }
+    //     bool ClickedOnButton = false;
+    //     for (const auto& btn : btns) {
+    //         if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
+    //             // Remove previous label if exists
+    //             ClickedOnButton = true;
 
-                // Attack label
-                Engine::Label* atkLabel = new Engine::Label("Attack: lvl 1 (" + std::to_string(btn.atk) + ")", "pirulen.ttf", 16,
-                                                            xStart, yStart + 40,  0, 0, 0, 255, 0);
-                UIGroup->AddNewObject(atkLabel);
+    //             int xStart = 1310;
+    //             int yStart = 310;
+    //             UIGroup->AddNewObject(turretInfoLabel = new Engine::Label(btn.name, "pirulen.ttf", 16, 
+    //                                                       xStart, yStart, 0, 0, 0, 255, 0));
+    //             turretInfoLabelInUI = true;
 
-                // HP label
-                Engine::Label* hpLabel = new Engine::Label("HP: lvl 1 (" + std::to_string(btn.hp) + ")", "pirulen.ttf", 16,
-                                                        xStart, yStart + 80,  0, 0, 0, 255, 0);
-                UIGroup->AddNewObject(hpLabel);
-                break;
-            }
-        }
-        // If right-clicked elsewhere and stats are showing, hide them
-        if (!ClickedOnButton && turretInfoLabel) {
-            if (turretInfoLabelInUI) {
-                auto iter = turretInfoLabel->GetObjectIterator();
-                if (iter->first) {
-                    UIGroup->RemoveObject(iter);
-                    turretInfoLabelInUI = false;
-                }
-            }
-            delete turretInfoLabel;
-            turretInfoLabel = nullptr;
-        }
-        return;
-    }
-    // Hide info label on left click anywhere
-    if ((button & 1) && turretInfoLabel) {
-        if (turretInfoLabelInUI) {
-            auto iter = turretInfoLabel->GetObjectIterator();
-            if (iter->first) {
-                UIGroup->RemoveObject(iter);
-                turretInfoLabelInUI = false;
-            }
-        }
-        delete turretInfoLabel;
-        turretInfoLabel = nullptr;
+    //             // Attack label
+    //             Engine::Label* atkLabel = new Engine::Label("Attack: lvl 1 (" + std::to_string(btn.atk) + ")", "pirulen.ttf", 16,
+    //                                                         xStart, yStart + 40,  0, 0, 0, 255, 0);
+    //             UIGroup->AddNewObject(atkLabel);
+
+    //             // HP label
+    //             Engine::Label* hpLabel = new Engine::Label("HP: lvl 1 (" + std::to_string(btn.hp) + ")", "pirulen.ttf", 16,
+    //                                                     xStart, yStart + 80,  0, 0, 0, 255, 0);
+    //             UIGroup->AddNewObject(hpLabel);
+    //             break;
+    //         }
+    //     }
+    //     return;
     }
     if ((button & 1) && !imgTarget->Visible && preview) {
         // Cancel turret construct.
         UIGroup->RemoveObject(preview->GetObjectIterator());
         preview = nullptr;
+        ClearTurretInfo();
     }
     IScene::OnMouseDown(button, mx, my);
+}
+void PlayScene::ClearTurretInfo() {
+    if (turretInfoLabel) {
+        UIGroup->RemoveObject(turretInfoLabel->GetObjectIterator());
+        delete turretInfoLabel;
+        turretInfoLabel = nullptr;
+    }
+    // Clear any additional labels if they exist
+    for (auto& label : turretInfoLabels) {
+        if (label) {
+            UIGroup->RemoveObject(label->GetObjectIterator());
+            delete label;
+            label = nullptr;
+        }
+    }
+    turretInfoLabels.clear();
+    turretInfoLabelInUI = false;
+}
+void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my) {
+    ClearTurretInfo(); // Clear any existing info first
+    
+    // Position the info box near the mouse but not off-screen
+    int boxX = 1310;
+    int boxY = 310;
+    int boxW = 280;
+    int boxH = 160;
+    
+    // Adjust position if it would go off-screen
+    int screenWidth = Engine::GameEngine::GetInstance().GetScreenSize().x;
+    if (boxX + boxW > screenWidth) {
+        boxX = mx - boxW - 20;
+    }
+    
+    // Create and position the info box background
+    UIGroup->AddNewObject(turretInfoLabel = new Engine::Label("", "pirulen.ttf", 16, boxX + 10, boxY + 10));
+    turretInfoLabelInUI = true;
+    
+    // Add name label
+    Engine::Label* nameLabel = new Engine::Label(btn.name, "pirulen.ttf", 18, boxX + 10, boxY + 10, 0, 0, 0);
+    UIGroup->AddNewObject(nameLabel);
+    turretInfoLabels.push_back(nameLabel);
+
+    // Add stats labels only for turrets (not shovel)
+    if (btn.name != "Shovel") {
+        Engine::Label* atkLabel = new Engine::Label("Attack: " + std::to_string(btn.atk), "pirulen.ttf", 14, boxX + 10, boxY + 40, 0, 0, 0);
+        UIGroup->AddNewObject(atkLabel);
+        turretInfoLabels.push_back(atkLabel);
+        
+        Engine::Label* hpLabel = new Engine::Label("Health: " + std::to_string(btn.hp), "pirulen.ttf", 14, boxX + 10, boxY + 70, 0, 0, 0);
+        UIGroup->AddNewObject(hpLabel);
+        turretInfoLabels.push_back(hpLabel);
+    }
+    
+    // Add cost label for turrets and landmine
+    if (btn.name != "Shovel") {
+        int cost = 0;
+        if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
+        else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
+        else if (btn.name == "Pierce Turret") cost = PierceTurret::Price;
+        else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
+        else if (btn.name == "Landmine") cost = Landmine::Price;
+        
+        Engine::Label* costLabel = new Engine::Label("Upgrade cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
+        UIGroup->AddNewObject(costLabel);
+        turretInfoLabels.push_back(costLabel);
+    }
 }
 void PlayScene::OnMouseMove(int mx, int my) {
     IScene::OnMouseMove(mx, my);
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
-    // Defensive: check imgTarget is not nullptr before accessing
-    if (!imgTarget) return;
-    // Remove the code that hides/removes turretInfoLabel on mouse move.
-    if (!preview && !shovelMode || x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
+    
+    // Don't hide/show target/shovel cursors when showing turret info
+    if (!turretInfoLabelInUI) {
+        if (!preview && !shovelMode || x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
+            imgTarget->Visible = false;
+            imgShovel->Visible = false;
+            return;
+        }
+
         imgTarget->Visible = false;
         imgShovel->Visible = false;
-        return;
-    }
+        
+        if (x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
+            return;
+        }
 
-    // Hide both cursors by default
-    imgTarget->Visible = false;
-    imgShovel->Visible = false;
-    
-    if (x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
-        return; // Out of bounds - keep cursors hidden
-    }
-
-    if (shovelMode) {
-        imgShovel->Visible = true;
-    } 
-    else if (preview) {
-        imgTarget->Visible = true;
-    }
-    
-    if (shovelMode) { //Shovel cursor
-        imgShovel->Visible = true;
-        imgShovel->Position.x = x * BlockSize;
-        imgShovel->Position.y = y * BlockSize;
-    }
-    else if (preview) { //if we're not using shovel, use the regular cursor instead
-        imgTarget->Visible = true;
-        imgTarget->Position.x = x * BlockSize;
-        imgTarget->Position.y = y * BlockSize;
+        if (shovelMode) {
+            imgShovel->Visible = true;
+        } 
+        else if (preview) {
+            imgTarget->Visible = true;
+        }
+        
+        if (shovelMode) {
+            imgShovel->Position.x = x * BlockSize;
+            imgShovel->Position.y = y * BlockSize;
+        }
+        else if (preview) {
+            imgTarget->Position.x = x * BlockSize;
+            imgTarget->Position.y = y * BlockSize;
+        }
     }
 }
 void PlayScene::OnMouseUp(int button, int mx, int my) {
@@ -835,6 +886,15 @@ void PlayScene::SaveScore(int score, const std::string& playerName) {
     }
 }
 
+const std::vector<PlayScene::TurretBtnInfo> PlayScene::turretBtnInfos = {
+    {1294, 136, 64, 64, "Machine Gun", 20, 100, ""},
+    {1370, 136, 64, 64, "Laser", 40, 80, ""},
+    {1446, 136, 64, 64, "Rocket", 60, 120, ""},
+    {1522, 136, 64, 64, "Pierce", 30, 90, ""},
+    {1294, 215, 64, 64, "Shovel", 0, 0, ""},
+    {1370, 215, 64, 64, "Landmine", 100, 1, ""},
+};
+
 void PlayScene::UIBtnClicked(int id) {
     if (currentPhase != GamePhase::CONSTRUCTION) return;
     
@@ -865,6 +925,7 @@ void PlayScene::UIBtnClicked(int id) {
             imgShovel->Position.x = (Engine::GameEngine::GetInstance().GetMousePosition().x / BlockSize) * BlockSize;
             imgShovel->Position.y = (Engine::GameEngine::GetInstance().GetMousePosition().y / BlockSize) * BlockSize;
         }
+        ClearTurretInfo();
         return;
     }
     else if (id == 5 && money >= Landmine::Price)
@@ -877,6 +938,12 @@ void PlayScene::UIBtnClicked(int id) {
     preview->Preview = true;
     UIGroup->AddNewObject(preview);
     OnMouseMove(Engine::GameEngine::GetInstance().GetMousePosition().x, Engine::GameEngine::GetInstance().GetMousePosition().y);
+
+    // Show turret info for the selected button if not shovel
+    // Removed to only show on right click as per user request
+    // if (id >= 0 && id < static_cast<int>(turretBtnInfos.size()) && id != 4) {
+    //     ShowTurretInfo(turretBtnInfos[id], 1310, 310);
+    // }
 }
 
 bool PlayScene::CheckSpaceValid(int x, int y) {
