@@ -22,6 +22,7 @@
 #include "Turret/LaserTurret.hpp"
 #include "Turret/MachineGunTurret.hpp"
 #include "Turret/PierceTurret.hpp"
+#include "Turret/RocketTurret.
 #include "Turret/TurretButton.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "UI/Animation/Plane.hpp"
@@ -477,11 +478,17 @@ void PlayScene::ConstructUI() {
                            Engine::Sprite("play/turret-3.png", 1446, 136 - 8, 0, 0, 0, 0), 1446, 136, PierceTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
     UIGroup->AddNewControlObject(btn);
-    //Button 4 (shovel)
+    //Button 4 (Feli's Turret)
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-6.png", 1522, 136 - 8, 0, 0, 0, 0), 1522, 136, RocketTurret::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
+    UIGroup->AddNewControlObject(btn);
+    //Button 5 (shovel)
     btn = new TurretButton( "play/shovel.png", "play/shovel.png",
         Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
         Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));  // Use ID 3 for shovel
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
     UIGroup->AddNewControlObject(btn);
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
@@ -518,7 +525,9 @@ void PlayScene::UIBtnClicked(int id) {
         preview = new LaserTurret(0, 0);
     else if (id == 2 && money >= PierceTurret::Price)
         preview = new PierceTurret(0, 0);
-    else if (id == 3) {
+    else if (id == 3 && money >= RocketTurret::Price)
+        preview = new RocketTurret(0, 0);
+    else if (id == 4) {
         preview = nullptr;
         shovelMode = true;
         return;
