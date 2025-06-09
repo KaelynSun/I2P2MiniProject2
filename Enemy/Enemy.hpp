@@ -21,11 +21,14 @@ protected:
     virtual void OnExplode();
 
 public:
-    float reachEndTime;
+    std::string type;
     bool buffed = false;
+    float reachEndTime;
     std::list<Turret *> lockedTurrets;
     std::list<Bullet *> lockedBullets;
     Enemy(std::string img, float x, float y, float radius, float speed, float hp, int money);
+    float getHP() const { return hp; }
+    void setHP(float value) { hp = value; }
     void Hit(float damage, bool isAOE);
     void UpdatePath(const std::vector<std::vector<int>> &mapDistance);
     void Update(float deltaTime) override;
