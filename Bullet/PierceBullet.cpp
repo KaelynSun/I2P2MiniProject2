@@ -38,7 +38,7 @@ void PierceBullet::Update(float deltaTime) {
 
         if (Engine::Collider::IsCircleOverlap(Position, CollisionRadius, enemy->Position, enemy->CollisionRadius)) {
             OnExplode(enemy);
-            enemy->Hit(damage);
+            enemy->Hit(damage, false);
 
             if (pierceCount <= 0) {
                 scene->BulletGroup->RemoveObject(objectIterator);
