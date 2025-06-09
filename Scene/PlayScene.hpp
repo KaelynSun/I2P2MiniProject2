@@ -55,6 +55,12 @@ public:
     std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
 
     // Turret stats
+    struct TurretBtnInfo {
+        int x, y, w, h;
+        std::string name;
+        int atk, hp;
+        std::string description;
+    };
     void ShowUpgradeUI(int turretType);
     static int machineGunUpgradeLevel;
     static int laserUpgradeLevel;
@@ -64,6 +70,11 @@ public:
     static float laserDamageMultiplier;
     static float rocketDamageMultiplier;
     static float pierceDamageMultiplier;
+    void ClearTurretInfo();
+    void ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my);
+    std::vector<Engine::Label*> turretInfoLabels; // To keep track of all info labels
+
+    static const std::vector<TurretBtnInfo> turretBtnInfos; // Turret button info for UI buttons
 
     int enemiesKilled;
     static bool DebugMode;
