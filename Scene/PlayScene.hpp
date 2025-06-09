@@ -27,6 +27,11 @@ private:
     };
     ALLEGRO_SAMPLE_ID bgmId;
     std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> deathBGMInstance;
+    int totalScore = 0;
+    bool shovelMode = false;
+    void showAccountDialog();
+    void showLoginDialog();
+    void savePlayerProgress();
 
 protected:
     int lives;
@@ -57,6 +62,7 @@ public:
     Engine::Label *UIMoney;
     Engine::Label *UILives;
     Engine::Image *imgTarget;
+    Engine::Image *imgShovel;
     Engine::Sprite *dangerIndicator;
     Turret *preview;
     std::vector<std::vector<TileType>> mapState;
@@ -80,9 +86,9 @@ public:
     void OnEnemyDefeated(Enemy* enemy);
     void ReadMap();
     void ReadEnemyWave();
+    void ConstructUI();
     void SaveScore(int score, const std::string& playerName);
     void BuffNearbyAllies(Enemy* supportEnemy);
-    void ConstructUI();
     void UIBtnClicked(int id);
     bool CheckSpaceValid(int x, int y);
     std::vector<std::vector<int>> CalculateBFSDistance();
