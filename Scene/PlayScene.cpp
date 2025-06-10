@@ -358,7 +358,8 @@ void PlayScene::Update(float deltaTime) {
         // To keep responding when paused.
         preview->Update(deltaTime);
     }
-    
+    // Add update call for GroundEffectGroup to update DirtyEffect objects
+    GroundEffectGroup->Update(deltaTime);
 }
 void PlayScene::Draw() const {
     IScene::Draw();
@@ -400,6 +401,8 @@ void PlayScene::Draw() const {
             }
         }
     }
+    // Add draw call for GroundEffectGroup to draw DirtyEffect objects
+    GroundEffectGroup->Draw();
 }
 void PlayScene::OnMouseDown(int button, int mx, int my) {
     if (paused) return;
@@ -419,6 +422,7 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
         };
         for (const auto& btn : btns) {
             if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
+                ClearTurretInfo();
                 ShowTurretInfo(btn, mx, my);
                 return; // Exit after finding the clicked button
             }
@@ -449,34 +453,31 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
     //     }
     //     return;
     }
-    if ((button & 1) && !imgTarget->Visible && preview) {
-        // Cancel turret construct.
-        UIGroup->RemoveObject(preview->GetObjectIterator());
-        preview = nullptr;
-        ClearTurretInfo();
-    }
+    // Commented out to fix first drag placement issue
+    // if ((button & 1) && !imgTarget->Visible && preview) {
+    //     // Cancel turret construct.
+    //     UIGroup->RemoveObject(preview->GetObjectIterator());
+    //     preview = nullptr;
+    //     ClearTurretInfo();
+    // }
     IScene::OnMouseDown(button, mx, my);
 }
 void PlayScene::ClearTurretInfo() {
     if (turretInfoLabel) {
         UIGroup->RemoveObject(turretInfoLabel->GetObjectIterator());
-        delete turretInfoLabel;
         turretInfoLabel = nullptr;
     }
     // Clear any additional labels if they exist
     for (auto& label : turretInfoLabels) {
         if (label) {
             UIGroup->RemoveObject(label->GetObjectIterator());
-            delete label;
-            label = nullptr;
         }
     }
     turretInfoLabels.clear();
     turretInfoLabelInUI = false;
 }
 void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my) {
-    ClearTurretInfo(); // Clear any existing info first
-    
+    //ClearTurretInfo(); // Clear any existing info first
     // Position the info box near the mouse but not off-screen
     int boxX = 1310;
     int boxY = 310;
@@ -489,38 +490,57 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my) {
         boxX = mx - boxW - 20;
     }
     
-    // Create and position the info box background
-    UIGroup->AddNewObject(turretInfoLabel = new Engine::Label("", "pirulen.ttf", 16, boxX + 10, boxY + 10));
-    turretInfoLabelInUI = true;
-    
-    // Add name label
-    Engine::Label* nameLabel = new Engine::Label(btn.name, "pirulen.ttf", 18, boxX + 10, boxY + 10, 0, 0, 0);
-    UIGroup->AddNewObject(nameLabel);
-    turretInfoLabels.push_back(nameLabel);
+    if (turretInfoLabelInUI && turretInfoLabel && !turretInfoLabels.empty()) {
+        // Update existing labels' text
+        turretInfoLabel->Text = "";
+        turretInfoLabels[0]->Text = btn.name;
+        if (btn.name != "Shovel") {
+            turretInfoLabels[1]->Text = "Attack: " + std::to_string(btn.atk);
+            turretInfoLabels[2]->Text = "Health: " + std::to_string(btn.hp);
+            int cost = 0;
+            if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
+            else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
+            else if (btn.name == "Pierce Turret") cost = PierceTurret::Price;
+            else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
+            else if (btn.name == "Landmine") cost = Landmine::Price;
+            turretInfoLabels[3]->Text = "Upgrade cost: $" + std::to_string(cost);
+        }
+    } else {
+        ClearTurretInfo(); // Clear any existing info first
+        
+        // Create and position the info box background
+        UIGroup->AddNewObject(turretInfoLabel = new Engine::Label("", "pirulen.ttf", 16, boxX + 10, boxY + 10));
+        turretInfoLabelInUI = true;
+        
+        // Add name label
+        Engine::Label* nameLabel = new Engine::Label(btn.name, "pirulen.ttf", 18, boxX + 10, boxY + 10, 0, 0, 0);
+        UIGroup->AddNewObject(nameLabel);
+        turretInfoLabels.push_back(nameLabel);
 
-    // Add stats labels only for turrets (not shovel)
-    if (btn.name != "Shovel") {
-        Engine::Label* atkLabel = new Engine::Label("Attack: " + std::to_string(btn.atk), "pirulen.ttf", 14, boxX + 10, boxY + 40, 0, 0, 0);
-        UIGroup->AddNewObject(atkLabel);
-        turretInfoLabels.push_back(atkLabel);
+        // Add stats labels only for turrets (not shovel)
+        if (btn.name != "Shovel") {
+            Engine::Label* atkLabel = new Engine::Label("Attack: " + std::to_string(btn.atk), "pirulen.ttf", 14, boxX + 10, boxY + 40, 0, 0, 0);
+            UIGroup->AddNewObject(atkLabel);
+            turretInfoLabels.push_back(atkLabel);
+            
+            Engine::Label* hpLabel = new Engine::Label("Health: " + std::to_string(btn.hp), "pirulen.ttf", 14, boxX + 10, boxY + 70, 0, 0, 0);
+            UIGroup->AddNewObject(hpLabel);
+            turretInfoLabels.push_back(hpLabel);
+        }
         
-        Engine::Label* hpLabel = new Engine::Label("Health: " + std::to_string(btn.hp), "pirulen.ttf", 14, boxX + 10, boxY + 70, 0, 0, 0);
-        UIGroup->AddNewObject(hpLabel);
-        turretInfoLabels.push_back(hpLabel);
-    }
-    
-    // Add cost label for turrets and landmine
-    if (btn.name != "Shovel") {
-        int cost = 0;
-        if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
-        else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
-        else if (btn.name == "Pierce Turret") cost = PierceTurret::Price;
-        else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
-        else if (btn.name == "Landmine") cost = Landmine::Price;
-        
-        Engine::Label* costLabel = new Engine::Label("Upgrade cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
-        UIGroup->AddNewObject(costLabel);
-        turretInfoLabels.push_back(costLabel);
+        // Add cost label for turrets and landmine
+        if (btn.name != "Shovel") {
+            int cost = 0;
+            if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
+            else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
+            else if (btn.name == "Pierce Turret") cost = PierceTurret::Price;
+            else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
+            else if (btn.name == "Landmine") cost = Landmine::Price;
+            
+            Engine::Label* costLabel = new Engine::Label("Upgrade cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
+            UIGroup->AddNewObject(costLabel);
+            turretInfoLabels.push_back(costLabel);
+        }
     }
 }
 void PlayScene::OnMouseMove(int mx, int my) {
@@ -594,6 +614,12 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
                 Engine::Sprite* sprite;
                 GroundEffectGroup->AddNewObject(sprite = new DirtyEffect("play/target-invalid.png", 1, x * BlockSize + BlockSize / 2, y * BlockSize + BlockSize / 2));
                 sprite->Rotation = 0;
+                // Remove preview turret and reset preview pointer after invalid placement
+                UIGroup->RemoveObject(preview->GetObjectIterator());
+                preview = nullptr;
+                // Reset target and shovel cursor visibility after invalid placement
+                if (imgTarget) imgTarget->Visible = false;
+                if (imgShovel) imgShovel->Visible = false;
                 return;
             }
             EarnMoney(-preview->GetPrice());
@@ -806,46 +832,41 @@ void PlayScene::ConstructUI() {
     TurretButton *btn;
     // Button 1
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1294, 171, 0, 0, 0, 0),
-        Engine::Sprite("play/turret-1.png", 1294, 163, 0, 0, 0, 0), 1294, 171, MachineGunTurret::Price);
+                           Engine::Sprite("play/tower-base.png", 1294, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-1.png", 1294, 136 - 8, 0, 0, 0, 0), 1294, 136, MachineGunTurret::Price);
+    // Reference: Class Member Function Pointer and std::bind.
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 0));
     UIGroup->AddNewControlObject(btn);
-    
     // Button 2
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1370, 171, 0, 0, 0, 0),
-        Engine::Sprite("play/turret-2.png", 1370, 163, 0, 0, 0, 0), 1370, 171, LaserTurret::Price);
+                           Engine::Sprite("play/tower-base.png", 1370, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-2.png", 1370, 136 - 8, 0, 0, 0, 0), 1370, 136, LaserTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
     UIGroup->AddNewControlObject(btn);
-    
-    // Button 3
+    //Button 3
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1446, 171, 0, 0, 0, 0),
-        Engine::Sprite("play/turret-3.png", 1446, 163, 0, 0, 0, 0), 1446, 171, PierceTurret::Price);
+                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-3.png", 1446, 136 - 8, 0, 0, 0, 0), 1446, 136, PierceTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
     UIGroup->AddNewControlObject(btn);
-    
-    // Button 4
+    //Button 4 (Feli's Turret)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1522, 171, 0, 0, 0, 0),
-        Engine::Sprite("play/turret-6.png", 1522, 163, 0, 0, 0, 0), 1522, 171, RocketTurret::Price);
+                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/turret-6.png", 1522, 136 - 8, 0, 0, 0, 0), 1522, 136, RocketTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
-    
-    // Button 5 (shovel)
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0),
-        Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0), 1294, 235, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
+    //Button 5 (shovel)
+    btn = new TurretButton( "play/floor.png", "play/dirt.png",
+        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
     UIGroup->AddNewControlObject(btn);
-    
-    // Button 6 (landmine)
+    //Button 6 (landmine)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1370, 235, 0, 0, 0, 0),
-        Engine::Sprite("play/landmine.png", 1370, 227, 0, 0, 0, 0), 1370, 235, Landmine::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
+        Engine::Sprite("play/tower-base.png", 1370, 200, 0, 0, 0, 0),
+        Engine::Sprite("play/landmine.png", 1370, 200 - 8, 0, 0, 0, 0), 1370, 200, Landmine::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5)); // Use ID 5 for shovel
     UIGroup->AddNewControlObject(btn);
-
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
@@ -905,8 +926,11 @@ void PlayScene::UIBtnClicked(int id) {
     
     Engine::Point mousePos = Engine::GameEngine::GetInstance().GetMousePosition();
     
-    if (preview)
+    if (preview) {
+        ClearTurretInfo();
         UIGroup->RemoveObject(preview->GetObjectIterator());
+        preview = nullptr;
+    }
     if (id == 0 && money >= MachineGunTurret::Price){
         preview = new MachineGunTurret(0, 0);
         shovelMode = false; // Exit shovel mode if a turret is selected 
@@ -947,6 +971,7 @@ void PlayScene::UIBtnClicked(int id) {
     // Show turret info for the selected button if not shovel
     // Removed to only show on right click as per user request
     // if (id >= 0 && id < static_cast<int>(turretBtnInfos.size()) && id != 4) {
+    //     ClearTurretInfo();
     //     ShowTurretInfo(turretBtnInfos[id], 1310, 310);
     // }
 }
