@@ -24,6 +24,14 @@ void Turret::Update(float deltaTime) {
     PlayScene *scene = getPlayScene();
     imgBase.Position = Position;
     imgBase.Tint = Tint;
+
+    lifetime += deltaTime; // Increase time alive
+    if (lifetime >= maxLifetime) {
+        Enabled = false; // Disable turret
+        Target = nullptr;
+        return;
+    }
+    
     if (!Enabled)
         return;
     if (Target) {
@@ -77,13 +85,22 @@ void Turret::Draw() const {
     if (Preview) {
         al_draw_filled_circle(Position.x, Position.y, CollisionRadius, al_map_rgba(0, 255, 0, 50));
     }
+
     imgBase.Draw();
     Sprite::Draw();
+
+    if (!Enabled) {
+        // Draw a red "X" or overlay if broken
+        al_draw_line(Position.x - 10, Position.y - 10, Position.x + 10, Position.y + 10, al_map_rgb(255, 0, 0), 3);
+        al_draw_line(Position.x - 10, Position.y + 10, Position.x + 10, Position.y - 10, al_map_rgb(255, 0, 0), 3);
+    }
+    
     if (PlayScene::DebugMode) {
         // Draw target radius.
         al_draw_circle(Position.x, Position.y, CollisionRadius, al_map_rgb(0, 0, 255), 2);
     }
 }
+
 int Turret::GetPrice() const {
     return price;
 }
