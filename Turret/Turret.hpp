@@ -15,15 +15,27 @@ protected:
     float coolDown;
     float reload = 0;
     float rotateRadian = 2 * ALLEGRO_PI;
-    float lifetime = 0; // Tracks how long the turret has been on the field
-    float maxLifetime = 30.0f; // Turret breaks down after 30 seconds
     Sprite imgBase;
     std::list<Turret *>::iterator lockedTurretIterator;
     PlayScene *getPlayScene();
     // Reference: Design Patterns - Factory Method.
     virtual void CreateBullet() = 0;
+    float hp, atk;
 
 public:
+    // New methods for upgrading
+    virtual void SetDamage(float damage) { this->atk = damage; }
+    virtual void SetHealth(float health) { this->hp = health; }
+    virtual std::string GetName() const = 0;
+    float GetDamage() const { return atk; }
+    float GetHealth() const { return hp; }
+    virtual int GetUpgradeCost() const { return price * 2; }
+    virtual void Upgrade() {
+        printf("Turret::Upgrade called. Before upgrade atk: %f, hp: %f\n", atk, hp);
+        atk *= 1.5f;
+        hp *= 1.5f;
+        printf("Turret::Upgrade called. After upgrade atk: %f, hp: %f\n", atk, hp);
+    }
     bool Enabled = true;
     bool Preview = false;
     Enemy *Target = nullptr;
