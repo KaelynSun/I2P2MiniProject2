@@ -30,6 +30,8 @@ private:
     std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> deathBGMInstance;
     int totalScore = 0;
     bool shovelMode = false;
+    float waveEndDelayTimer;
+    Enemy* hoveredEnemy = nullptr;
     void showAccountDialog();
     void showLoginDialog();
     void savePlayerProgress();
@@ -47,9 +49,9 @@ public:
     int currentWave;
     float waveTimer;
     float constructionTimer;
+    static const float WaveEndDelay;
     float postWaveDelayTimer; // New timer for delay after wave ends
     static const float ConstructionTime; // 10 seconds construction phase
-    // const float WaveInterval = 5.0f; // 5 seconds between waves
     
     // Enemy wave data
     std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
