@@ -70,6 +70,23 @@ Engine::Point PlayScene::GetClientSize() {
     return Engine::Point(MapWidth * BlockSize, MapHeight * BlockSize);
 }
 void PlayScene::Initialize() {
+    // Clear all turret info UI elements first
+    ClearTurretInfo();
+    if (turretInfoLabel) {
+        UIGroup->RemoveObject(turretInfoLabel->GetObjectIterator());
+        turretInfoLabel = nullptr;
+    }
+    for (auto& label : turretInfoLabels) {
+        if (label) {
+            UIGroup->RemoveObject(label->GetObjectIterator());
+        }
+    }
+    turretInfoLabels.clear();
+    if (upgradeButton) {
+        upgradeButton->SetOnClickCallback(nullptr);
+        UIGroup->RemoveObject(upgradeButton->GetObjectIterator());
+        upgradeButton = nullptr;
+    }
     mapState.clear();
     keyStrokes.clear();
     ticks = 0;
@@ -100,6 +117,9 @@ void PlayScene::Initialize() {
     ReadMap();
     ReadEnemyWave();
     
+    // Clear any existing enemies
+    EnemyGroup->Clear();
+
     // Only put the first round's enemies in the queue
     if (!allEnemyWaves.empty()) {
         enemyWaveData = allEnemyWaves[0];
@@ -155,6 +175,7 @@ void PlayScene::Update(float deltaTime) {
                 enemyWaveData = allEnemyWaves[currentWave];
                 currentPhase = GamePhase::WAVE;
                 constructionTimerLabel->Text = "";
+                ticks = 0; // Reset ticks to start enemy spawn timing fresh
             }
         }
         else { // WAVE phase
@@ -162,6 +183,11 @@ void PlayScene::Update(float deltaTime) {
 
             // Check if wave is complete (all enemies spawned and no enemies left)
             if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
+                // Clear any remaining enemies (just to be safe)
+                for (auto& obj : EnemyGroup->GetObjects()) {
+                    EnemyGroup->RemoveObject(obj->GetObjectIterator());
+                }
+                
                 if (currentWave >= 3) {
                     // Update high score before switching scene
                     accountManager.updateHighScore(totalScore);
@@ -190,6 +216,7 @@ void PlayScene::Update(float deltaTime) {
                     snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
                     constructionTimerLabel->Text = buffer;
                 }
+                EnemyGroup->Clear();
             }
         }
 
@@ -539,6 +566,9 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
         }
         IScene::OnMouseDown(button, mx, my);
     }
+    else if ((button & 1)) {
+        IScene::OnMouseDown(button, mx, my);
+    }
 }
 void PlayScene::ClearTurretInfo() {
     if (turretInfoLabel) {
@@ -554,6 +584,7 @@ void PlayScene::ClearTurretInfo() {
     turretInfoLabels.clear();
      // Clear the upgrade button if it exists
     if (upgradeButton) {
+        upgradeButton->SetOnClickCallback(nullptr); // Clear callback to prevent dangling references
         UIGroup->RemoveObject(upgradeButton->GetObjectIterator());
         upgradeButton = nullptr;
     }
@@ -947,12 +978,15 @@ void PlayScene::ReadEnemyWave() {
         fin.close();
         allEnemyWaves.push_back(currentWave);
     }
-    // Only put the first round's enemies in the queue
-    if (!allEnemyWaves.empty()) {
-        enemyWaveData = allEnemyWaves[0];
-    } else {
-        enemyWaveData.clear();
-    }
+    
+    enemyWaveData.clear();
+
+    // // Only put the first round's enemies in the queue
+    // if (!allEnemyWaves.empty()) {
+    //     enemyWaveData = allEnemyWaves[0];
+    // } else {
+    //     enemyWaveData.clear();
+    // }
 }
 
 void PlayScene::OnEnemyDefeated(Enemy *enemy){
