@@ -12,6 +12,7 @@
 const int RocketTurret::Price = 500;
 RocketTurret::RocketTurret(float x, float y)
     : Turret("play/tower-base.png", "play/turret-6.png", x, y, 500, Price, 1.5) {
+        maxLifetime = 40.0f;
     // Move center downward, since we the turret head is slightly biased upward.
     Anchor.y += 8.0f / GetBitmapHeight();
 }
