@@ -14,6 +14,8 @@ MachineGunTurret::MachineGunTurret(float x, float y)
     : Turret("play/tower-base.png", "play/turret-1.png", x, y, 200, Price, 0.5) {
     // Move center downward, since we the turret head is slightly biased upward.
     Anchor.y += 8.0f / GetBitmapHeight();
+    atk = 20.0f;  // Set initial attack value
+    hp = 100.0f;  // Set initial health value
 }
 void MachineGunTurret::CreateBullet() {
     Engine::Point diff = Engine::Point(cos(Rotation - ALLEGRO_PI / 2), sin(Rotation - ALLEGRO_PI / 2));
