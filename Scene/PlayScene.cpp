@@ -42,7 +42,7 @@
 // TODO HACKATHON-5 (2/4): The "LIFE" label are not updated when you lose a life. Try to fix it. [DONE line 280]
 
 bool PlayScene::paused = false;
-const float PlayScene::ConstructionTime = 60.0f;  // or whatever value you want
+const float PlayScene::ConstructionTime = 5.0f;  // or whatever value you want
 static Engine::Label* turretInfoLabel = nullptr;
 static bool turretInfoLabelInUI = false;
 bool PlayScene::DebugMode = false;
@@ -363,6 +363,7 @@ void PlayScene::Update(float deltaTime) {
 }
 void PlayScene::Draw() const {
     IScene::Draw();
+
     if (turretInfoLabel && turretInfoLabelInUI) {
         int boxX = 1300;
         int boxY = 300;
@@ -376,18 +377,59 @@ void PlayScene::Draw() const {
     }
     if (paused) {
         // Draw semi-transparent black overlay
-        al_draw_filled_rectangle(0, 0, 
-            MapWidth * BlockSize, 
-            MapHeight * BlockSize, 
-            al_map_rgba(0, 0, 0, 150));
+        al_draw_filled_rectangle(0, 0, MapWidth * BlockSize, MapHeight * BlockSize, al_map_rgba(0, 0, 0, 150));
         
         // Draw pause text
-        Engine::Label pauseText("PAUSED", "pirulen.ttf", 96, 
-            MapWidth * BlockSize / 2, 
-            MapHeight * BlockSize / 2);
+        Engine::Label pauseText("PAUSED", "pirulen.ttf", 96, MapWidth * BlockSize / 2, MapHeight * BlockSize / 2);
         pauseText.Anchor = Engine::Point(0.5, 0.5);
         pauseText.Draw();
     }
+
+    if (hoveredEnemy) {
+
+        // Create a background panel
+        al_draw_filled_rectangle(hoveredEnemy->Position.x - 50, hoveredEnemy->Position.y + 20, hoveredEnemy->Position.x + 50, hoveredEnemy->Position.y + 50, al_map_rgba(0, 255, 0, 0.3)
+        );
+
+        // Draw enemy type (now below)
+        Engine::Label typeLabel(hoveredEnemy->type, "pirulen.ttf", 12, hoveredEnemy->Position.x, hoveredEnemy->Position.y + 30
+        );
+        typeLabel.Anchor = Engine::Point(0.5, 0.5);
+        typeLabel.Draw();
+
+        float hp = hoveredEnemy->getHP();
+        float baseMaxHP = hoveredEnemy->getMaxHP();
+        float maxHP = std::max(hp, baseMaxHP); // Used for full bar width
+        float barWidth = 80.0f;
+        float barHeight = 10.0f;
+        float left = hoveredEnemy->Position.x - barWidth / 2;
+        float top = hoveredEnemy->Position.y + 40;
+
+        // Background bar
+        al_draw_filled_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(100, 100, 100));
+
+        // Filled health portion
+        float normalPercent = std::min(hp, baseMaxHP) / maxHP;
+        ALLEGRO_COLOR normalColor = normalPercent > 0.6 ? al_map_rgb(0, 200, 0) :
+                                    normalPercent > 0.3 ? al_map_rgb(255, 155, 0) : al_map_rgb(200, 0, 0);
+
+        al_draw_filled_rectangle(left, top, left + barWidth * normalPercent, top + barHeight, normalColor);
+
+        // Border
+        al_draw_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(255, 255, 255), 1);
+
+        if (hp > baseMaxHP) {
+            float overflowPercent = (hp - baseMaxHP) / maxHP;
+            al_draw_filled_rectangle(
+                left + barWidth * normalPercent, top,
+                left + barWidth * (normalPercent + overflowPercent), top + barHeight,
+                al_map_rgb(0, 150, 255) // Blue for overflow
+            );
+        }
+
+        al_draw_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(255, 255, 255), 1);
+    }
+
     if (DebugMode) {
         // Draw reverse BFS distance on all reachable blocks.
         for (int i = 0; i < MapHeight; i++) {
@@ -413,10 +455,10 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
         
         // Check if mouse is over a turret button
         std::vector<TurretBtnInfo> btns = {
-            {1294, 136, 64, 64, "Machine Gun Turret", 20, 100, ""},
+            {1294, 136, 64, 64, "Machine Gun", 20, 100, ""},
             {1370, 136, 64, 64, "Laser Turret", 40, 80, ""},
-            {1446, 136, 64, 64, "Rocket Turret", 60, 120, ""},
-            {1522, 136, 64, 64, "Pierce Turret", 30, 90, ""},
+            {1446, 136, 64, 64, "Pierce Turret", 60, 120, ""},
+            {1522, 136, 64, 64, "Rocket Turret", 30, 90, ""},
             {1294, 215, 64, 64, "Shovel", 0, 0, ""},
             {1370, 215, 64, 64, "Landmine", 100, 1, ""},
         };
@@ -427,39 +469,7 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
                 return; // Exit after finding the clicked button
             }
         }
-    //     bool ClickedOnButton = false;
-    //     for (const auto& btn : btns) {
-    //         if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
-    //             // Remove previous label if exists
-    //             ClickedOnButton = true;
-
-    //             int xStart = 1310;
-    //             int yStart = 310;
-    //             UIGroup->AddNewObject(turretInfoLabel = new Engine::Label(btn.name, "pirulen.ttf", 16, 
-    //                                                       xStart, yStart, 0, 0, 0, 255, 0));
-    //             turretInfoLabelInUI = true;
-
-    //             // Attack label
-    //             Engine::Label* atkLabel = new Engine::Label("Attack: lvl 1 (" + std::to_string(btn.atk) + ")", "pirulen.ttf", 16,
-    //                                                         xStart, yStart + 40,  0, 0, 0, 255, 0);
-    //             UIGroup->AddNewObject(atkLabel);
-
-    //             // HP label
-    //             Engine::Label* hpLabel = new Engine::Label("HP: lvl 1 (" + std::to_string(btn.hp) + ")", "pirulen.ttf", 16,
-    //                                                     xStart, yStart + 80,  0, 0, 0, 255, 0);
-    //             UIGroup->AddNewObject(hpLabel);
-    //             break;
-    //         }
-    //     }
-    //     return;
     }
-    // Commented out to fix first drag placement issue
-    // if ((button & 1) && !imgTarget->Visible && preview) {
-    //     // Cancel turret construct.
-    //     UIGroup->RemoveObject(preview->GetObjectIterator());
-    //     preview = nullptr;
-    //     ClearTurretInfo();
-    // }
     IScene::OnMouseDown(button, mx, my);
 }
 void PlayScene::ClearTurretInfo() {
@@ -547,6 +557,20 @@ void PlayScene::OnMouseMove(int mx, int my) {
     IScene::OnMouseMove(mx, my);
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
+
+    hoveredEnemy = nullptr;
+
+    for (auto& obj : EnemyGroup->GetObjects()) {
+        Enemy* enemy = dynamic_cast<Enemy*>(obj);
+        if (enemy) {
+            float dx = mx - enemy->Position.x;
+            float dy = my - enemy->Position.y;
+            if (dx*dx + dy*dy < enemy->CollisionRadius * enemy->CollisionRadius) {
+                hoveredEnemy = enemy;
+                break;
+            }
+        }
+    }
     
     // Don't hide/show target/shovel cursors when showing turret info
     if (!turretInfoLabelInUI) {
@@ -832,41 +856,46 @@ void PlayScene::ConstructUI() {
     TurretButton *btn;
     // Button 1
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1294, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-1.png", 1294, 136 - 8, 0, 0, 0, 0), 1294, 136, MachineGunTurret::Price);
-    // Reference: Class Member Function Pointer and std::bind.
+        Engine::Sprite("play/tower-base.png", 1294, 171, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-1.png", 1294, 163, 0, 0, 0, 0), 1294, 171, MachineGunTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 0));
     UIGroup->AddNewControlObject(btn);
+    // Reference: Class Member Function Pointer and std::bind.
     // Button 2
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1370, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-2.png", 1370, 136 - 8, 0, 0, 0, 0), 1370, 136, LaserTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1370, 171, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-2.png", 1370, 163, 0, 0, 0, 0), 1370, 171, LaserTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
     UIGroup->AddNewControlObject(btn);
-    //Button 3
+
+    // Button 3
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-3.png", 1446, 136 - 8, 0, 0, 0, 0), 1446, 136, PierceTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1446, 171, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-3.png", 1446, 163, 0, 0, 0, 0), 1446, 171, PierceTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
     UIGroup->AddNewControlObject(btn);
-    //Button 4 (Feli's Turret)
+
+    // Button 4
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-6.png", 1522, 136 - 8, 0, 0, 0, 0), 1522, 136, RocketTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1522, 171, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-6.png", 1522, 163, 0, 0, 0, 0), 1522, 171, RocketTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
-    //Button 5 (shovel)
-    btn = new TurretButton( "play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
-        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
-    UIGroup->AddNewControlObject(btn);
-    //Button 6 (landmine)
+
+    // Button 5 (shovel)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1370, 200, 0, 0, 0, 0),
-        Engine::Sprite("play/landmine.png", 1370, 200 - 8, 0, 0, 0, 0), 1370, 200, Landmine::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5)); // Use ID 5 for shovel
+        Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0), 1294, 235, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
     UIGroup->AddNewControlObject(btn);
+
+    // Button 6 (landmine)
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+        Engine::Sprite("play/tower-base.png", 1370, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/landmine.png", 1370, 227, 0, 0, 0, 0), 1370, 235, Landmine::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
+    UIGroup->AddNewControlObject(btn);
+
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
