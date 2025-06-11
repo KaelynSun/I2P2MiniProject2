@@ -22,8 +22,16 @@ namespace Engine {
         std::shared_ptr<ALLEGRO_BITMAP> imgIn;
         // The callback function to call when button clicked.
         std::function<void()> OnClickCallback;
+        std::function<void()> OnHoverCallback;
+        std::function<void()> OnOutCallback;
+        bool isHovered = false;
+        ALLEGRO_COLOR hoverTint = al_map_rgb(255, 255, 255); // Default white
+        ALLEGRO_COLOR normalTint = al_map_rgb(255, 255, 255); // Default white
 
     public:
+        void SetHoverTint(ALLEGRO_COLOR color);
+        void SetNormalTint(ALLEGRO_COLOR color);
+        void Draw() const override;
         // Whether the button can be pressed.
         bool Enabled = true;
         /// <summary>
@@ -43,6 +51,8 @@ namespace Engine {
         /// </summary>
         /// <param name="onClickCallback"></param>
         void SetOnClickCallback(std::function<void(void)> onClickCallback);
+        void SetOnHoverCallback(std::function<void()> callback);
+        void SetOnOutCallback(std::function<void()> callback);
         /// <summary>
         /// Delegated from scene when mouse button down.
         /// </summary>
