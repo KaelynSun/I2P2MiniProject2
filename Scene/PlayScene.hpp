@@ -17,6 +17,7 @@ namespace Engine {
     class Image;
     class Label;
     class Sprite;
+    class ImageButton;
 }   // namespace Engine
 
 class PlayScene final : public Engine::IScene {
@@ -52,6 +53,7 @@ public:
     static const float WaveEndDelay;
     float postWaveDelayTimer; // New timer for delay after wave ends
     static const float ConstructionTime; // 10 seconds construction phase
+    // const float WaveInterval = 5.0f; // 5 seconds between waves
     
     // Enemy wave data
     std::vector<std::deque<std::pair<int, float>>> allEnemyWaves;
@@ -73,7 +75,7 @@ public:
     static float rocketDamageMultiplier;
     static float pierceDamageMultiplier;
     void ClearTurretInfo();
-    void ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my);
+    void ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret* actualTurret = nullptr);
     std::vector<Engine::Label*> turretInfoLabels; // To keep track of all info labels
 
     static const std::vector<TurretBtnInfo> turretBtnInfos; // Turret button info for UI buttons
@@ -114,6 +116,9 @@ public:
     std::vector<std::vector<int>> mapDistance;
     std::deque<std::pair<int, float>> enemyWaveData;
     std::list<int> keyStrokes;
+
+    Engine::ImageButton* upgradeButton = nullptr;  // Add upgrade button image pointer
+
     static Engine::Point GetClientSize();
     explicit PlayScene() = default;
     void Initialize() override;
