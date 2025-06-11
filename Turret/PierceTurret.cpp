@@ -13,6 +13,7 @@ const int PierceTurret::Price = 200;
 
 PierceTurret::PierceTurret(float x, float y)
     : Turret("play/tower-base.png", "play/turret-3.png", x, y, 350, Price, 0.8) {
+        maxLifetime = 35.0f;
     Anchor.y += 8.0f / GetBitmapHeight();
 }
 
