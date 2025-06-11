@@ -15,19 +15,12 @@
 PlayScene *Turret::getPlayScene() {
     return dynamic_cast<PlayScene *>(Engine::GameEngine::GetInstance().GetActiveScene());
 }
-Turret::Turret(std::string imgBase, std::string imgTurret, float x, float y, float radius, int price, float coolDown) : Sprite(imgTurret, x, y), price(price), coolDown(coolDown), imgBase(imgBase, x, y) {
+Turret::Turret(std::string imgBase, std::string imgTurret, float x, float y, float radius, int price, float coolDown) : 
+Sprite(imgTurret, x, y), price(price), coolDown(coolDown), imgBase(imgBase, x, y), atk(0), hp(0) {
     CollisionRadius = radius;
 }
 void Turret::Update(float deltaTime) {
     Sprite::Update(deltaTime);
-
-    lifetime += deltaTime; // Increase time alive
-    if (lifetime >= maxLifetime) {
-        Enabled = false; // Disable turret
-        Target = nullptr;
-        return;
-    }
-
     PlayScene *scene = getPlayScene();
     imgBase.Position = Position;
     imgBase.Tint = Tint;
@@ -84,16 +77,8 @@ void Turret::Draw() const {
     if (Preview) {
         al_draw_filled_circle(Position.x, Position.y, CollisionRadius, al_map_rgba(0, 255, 0, 50));
     }
-
     imgBase.Draw();
     Sprite::Draw();
-
-    if (!Enabled) {
-        // Draw a red "X" or overlay if broken
-        al_draw_line(Position.x - 10, Position.y - 10, Position.x + 10, Position.y + 10, al_map_rgb(255, 0, 0), 3);
-        al_draw_line(Position.x - 10, Position.y + 10, Position.x + 10, Position.y - 10, al_map_rgb(255, 0, 0), 3);
-    }
-    
     if (PlayScene::DebugMode) {
         // Draw target radius.
         al_draw_circle(Position.x, Position.y, CollisionRadius, al_map_rgb(0, 0, 255), 2);
