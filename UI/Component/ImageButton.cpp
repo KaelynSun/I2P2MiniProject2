@@ -24,9 +24,44 @@ namespace Engine {
                 OnClickCallback();
         }
     }
-    void ImageButton::OnMouseMove(int mx, int my) {
-        mouseIn = Collider::IsPointInBitmap(Point((mx - Position.x) * GetBitmapWidth() / Size.x + Anchor.x * GetBitmapWidth(), (my - Position.y) * GetBitmapHeight() / Size.y + Anchor.y * GetBitmapHeight()), bmp);
-        if (!mouseIn || !Enabled) bmp = imgOut;
-        else bmp = imgIn;
+void ImageButton::OnMouseMove(int mx, int my) {
+        bool wasHovered = mouseIn;
+        bool newMouseIn = Collider::IsPointInBitmap(Point((mx - Position.x) * GetBitmapWidth() / Size.x + Anchor.x * GetBitmapWidth(), 
+                                        (my - Position.y) * GetBitmapHeight() / Size.y + Anchor.y * GetBitmapHeight()), bmp);
+        if (newMouseIn != wasHovered) {
+            mouseIn = newMouseIn;
+            if (!mouseIn || !Enabled) {
+                bmp = imgOut;
+                if (wasHovered && OnOutCallback) {
+                    OnOutCallback();
+                }
+            } else {
+                bmp = imgIn;
+                if (!wasHovered && OnHoverCallback) {
+                    OnHoverCallback();
+                }
+            }
+            isHovered = mouseIn && Enabled;
+        }
     }
-}
+    void ImageButton::SetOnHoverCallback(std::function<void()> callback) {
+        OnHoverCallback = callback;
+    }
+    void ImageButton::SetOnOutCallback(std::function<void()> callback) {
+        OnOutCallback = callback;
+    }
+    void ImageButton::SetHoverTint(ALLEGRO_COLOR color) {
+        hoverTint = color;
+    }
+    void ImageButton::SetNormalTint(ALLEGRO_COLOR color) {
+        normalTint = color;
+    }
+    void ImageButton::Draw() const {
+            if (Visible) {
+                al_draw_tinted_scaled_bitmap(bmp.get(), isHovered ? hoverTint : normalTint, 
+                                            0, 0, al_get_bitmap_width(bmp.get()), al_get_bitmap_height(bmp.get()),
+                                            Position.x - Anchor.x * Size.x, Position.y - Anchor.y * Size.y, 
+                                            Size.x, Size.y, 0);
+            }
+        }
+    }
