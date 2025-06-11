@@ -386,48 +386,71 @@ void PlayScene::Draw() const {
     }
 
     if (hoveredEnemy) {
+        // Popup configuration
+        float popupWidth = 100.0f;
+        float popupHeight = 50.0f;
+        float barWidth = 80.0f;
+        float barHeight = 10.0f;
+        float radius = 5.0f;
 
-        // Create a background panel
-        al_draw_filled_rectangle(hoveredEnemy->Position.x - 50, hoveredEnemy->Position.y + 20, hoveredEnemy->Position.x + 50, hoveredEnemy->Position.y + 50, al_map_rgba(0, 255, 0, 0.3)
-        );
+        // Popup positioning (below enemy)
+        float centerX = hoveredEnemy->Position.x;
+        float topY = hoveredEnemy->Position.y + 20;
+        float left = centerX - popupWidth / 2;
+        float right = centerX + popupWidth / 2;
+        float bottom = topY + popupHeight;
 
-        // Draw enemy type (now below)
-        Engine::Label typeLabel(hoveredEnemy->type, "pirulen.ttf", 12, hoveredEnemy->Position.x, hoveredEnemy->Position.y + 30
-        );
+        // Draw rounded background
+        al_draw_filled_rounded_rectangle(left, topY, right, bottom, radius, radius, al_map_rgba(211, 169, 108, 180));
+
+        // Draw enemy type label
+        Engine::Label typeLabel(hoveredEnemy->type, "pirulen.ttf", 12, centerX, topY + 10);
         typeLabel.Anchor = Engine::Point(0.5, 0.5);
         typeLabel.Draw();
 
+        // Health bar logic
         float hp = hoveredEnemy->getHP();
         float baseMaxHP = hoveredEnemy->getMaxHP();
-        float maxHP = std::max(hp, baseMaxHP); // Used for full bar width
-        float barWidth = 80.0f;
-        float barHeight = 10.0f;
-        float left = hoveredEnemy->Position.x - barWidth / 2;
-        float top = hoveredEnemy->Position.y + 40;
-
-        // Background bar
-        al_draw_filled_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(100, 100, 100));
-
-        // Filled health portion
+        float maxHP = std::max(hp, baseMaxHP); // To handle overflow
         float normalPercent = std::min(hp, baseMaxHP) / maxHP;
+
+        float barLeft = centerX - barWidth / 2;
+        float barTop = topY + 25;
+
+        // Bar background
+        al_draw_filled_rectangle(
+            barLeft, barTop,
+            barLeft + barWidth, barTop + barHeight,
+            al_map_rgb(100, 100, 100)
+        );
+
+        // Normal HP portion
         ALLEGRO_COLOR normalColor = normalPercent > 0.6 ? al_map_rgb(0, 200, 0) :
-                                    normalPercent > 0.3 ? al_map_rgb(255, 155, 0) : al_map_rgb(200, 0, 0);
+                                    normalPercent > 0.3 ? al_map_rgb(255, 165, 0) :
+                                                        al_map_rgb(200, 0, 0);
 
-        al_draw_filled_rectangle(left, top, left + barWidth * normalPercent, top + barHeight, normalColor);
+        al_draw_filled_rectangle(
+            barLeft, barTop,
+            barLeft + barWidth * normalPercent, barTop + barHeight,
+            normalColor
+        );
 
-        // Border
-        al_draw_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(255, 255, 255), 1);
-
+        // Overflow (bonus HP)
         if (hp > baseMaxHP) {
             float overflowPercent = (hp - baseMaxHP) / maxHP;
             al_draw_filled_rectangle(
-                left + barWidth * normalPercent, top,
-                left + barWidth * (normalPercent + overflowPercent), top + barHeight,
-                al_map_rgb(0, 150, 255) // Blue for overflow
+                barLeft + barWidth * normalPercent, barTop,
+                barLeft + barWidth * (normalPercent + overflowPercent), barTop + barHeight,
+                al_map_rgb(0, 150, 255)
             );
         }
 
-        al_draw_rectangle(left, top, left + barWidth, top + barHeight, al_map_rgb(255, 255, 255), 1);
+        // Border
+        al_draw_rectangle(
+            barLeft, barTop,
+            barLeft + barWidth, barTop + barHeight,
+            al_map_rgb(255, 255, 255), 1
+        );
     }
 
     if (DebugMode) {
