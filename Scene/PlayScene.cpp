@@ -42,7 +42,7 @@
 // TODO HACKATHON-5 (2/4): The "LIFE" label are not updated when you lose a life. Try to fix it. [DONE line 280]
 
 bool PlayScene::paused = false;
-const float PlayScene::ConstructionTime = 10.0f;  // or whatever value you want
+const float PlayScene::ConstructionTime = 5.0f;  // or whatever value you want
 static Engine::Label* turretInfoLabel = nullptr;
 static bool turretInfoLabelInUI = false;
 static int selectedTurretX = -1;
@@ -65,11 +65,13 @@ void PlayScene::FreeMapTile(int x, int y) {
         mapState[y][x] = TILE_FLOOR;
     }
 }
+
 float PlayScene::CalculateDistance(const Engine::Point& p1, const Engine::Point& p2) {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;
     return sqrt(dx*dx + dy*dy);
 }
+
 Engine::Point PlayScene::GetClientSize() {
     return Engine::Point(MapWidth * BlockSize, MapHeight * BlockSize);
 }
@@ -134,12 +136,15 @@ void PlayScene::Initialize() {
     mapDistance = CalculateBFSDistance();
     ConstructUI();
     imgTarget = new Engine::Image("play/target.png", 0, 0);
-    imgShovel = new Engine::Image("play/shovel.png", 0,0);
+    imgShovel = new Engine::Image("play/shovel.png", 0, 0);
+    imgWrench = new Engine::Image("play/wrench.png", 0, 0);
     imgTarget->Visible = false;
     imgShovel->Visible = false;
+    imgWrench->Visible = false;
     preview = nullptr;
     UIGroup->AddNewObject(imgTarget);
     UIGroup->AddNewObject(imgShovel);
+    UIGroup->AddNewObject(imgWrench); 
     // Preload Lose Scene
     deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("astronomia.ogg");
     Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
@@ -154,7 +159,9 @@ void PlayScene::Terminate() {
 }
 
 void PlayScene::Update(float deltaTime) {
-    // If paused, skip updating game objects (enemies, bullets, etc.)
+    // If we use deltaTime directly, then we might have Bullet-through-paper problem.
+    // Reference: Bullet-Through-Paper
+
     if (paused) {
         // Still update UI and preview for responsiveness
         if (preview) {
@@ -167,78 +174,78 @@ void PlayScene::Update(float deltaTime) {
 
     // Construction
     // Handle game phases
-    if (currentPhase == GamePhase::CONSTRUCTION) {
-        constructionTimer -= deltaTime;
-        if (constructionTimer < 0) constructionTimer = 0;
-        // Update label
-        int secondsLeft = static_cast<int>(ceil(constructionTimer));
-        int minutes = secondsLeft / 60;
-        int seconds = secondsLeft % 60;
-        char buffer[32];
-        snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
-        constructionTimerLabel->Text = buffer;
-        // Only go to win scene if all rounds are done AND this is the final construction phase (after all waves)
-        if (constructionTimer <= 0) {
-            if (currentWave >= 4) { // Ensure win only after 4 rounds
-                Engine::GameEngine::GetInstance().ChangeScene("win");
-                return;
-            }
-            // Only put the current round's enemies in the queue at the start of each wave
-            enemyWaveData = allEnemyWaves[currentWave];
-            currentPhase = GamePhase::WAVE;
-            constructionTimerLabel->Text = "";
-            ticks = 0; // Reset ticks to start enemy spawn timing fresh
-
-            // Remove preview when entering WAVE phase
-            if (preview) {
-                UIGroup->RemoveObject(preview->GetObjectIterator());
-                preview = nullptr;
-                imgTarget->Visible = false;
-                imgShovel->Visible = false;
-            }
-        }
-    }
-    else { // WAVE phase
-        waveTimer += deltaTime;
-
-        // Check if wave is complete (all enemies spawned and no enemies left)
-        if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
-            // Clear any remaining enemies (just to be safe)
-            for (auto& obj : EnemyGroup->GetObjects()) {
-                EnemyGroup->RemoveObject(obj->GetObjectIterator());
-            }
-            
-            if (currentWave >= 3) {
-                // Update high score before switching scene
-                accountManager.updateHighScore(totalScore);
-
-                // Pass score and name to WinScene
-                auto* winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
-                if (winScene) {
-                    winScene->SetFinalScore(totalScore);
-                    winScene->SetPlayerName(accountManager.getCurrentUsername());
+        if (currentPhase == GamePhase::CONSTRUCTION) {
+            constructionTimer -= deltaTime;
+            if (constructionTimer < 0) constructionTimer = 0;
+            // Update label
+            int secondsLeft = static_cast<int>(ceil(constructionTimer));
+            int minutes = secondsLeft / 60;
+            int seconds = secondsLeft % 60;
+            char buffer[32];
+            snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+            constructionTimerLabel->Text = buffer;
+            // Only go to win scene if all rounds are done AND this is the final construction phase (after all waves)
+            if (constructionTimer <= 0) {
+                if (currentWave >= 4) { // Ensure win only after 4 rounds
+                    Engine::GameEngine::GetInstance().ChangeScene("win");
+                    return;
                 }
+                // Only put the current round's enemies in the queue at the start of each wave
+                enemyWaveData = allEnemyWaves[currentWave];
+                currentPhase = GamePhase::WAVE;
+                constructionTimerLabel->Text = "";
+                ticks = 0; // Reset ticks to start enemy spawn timing fresh
 
-                // Change to win scene
-                Engine::GameEngine::GetInstance().ChangeScene("win");
-                return;
+                if (preview) {
+                    UIGroup->RemoveObject(preview->GetObjectIterator());
+                    preview = nullptr;
+                    imgTarget->Visible = false;
+                    imgShovel->Visible = false;
+                    imgWrench->Visible = false;
+                }
             }
-            currentWave++;
-            // Always go to construction phase, even after last wave
-            currentPhase = GamePhase::CONSTRUCTION;
-            constructionTimer = ConstructionTime;
-            // Reset construction timer label text for new construction phase
-            if (constructionTimerLabel) {
-                int secondsLeft = static_cast<int>(ceil(constructionTimer));
-                int minutes = secondsLeft / 60;
-                int seconds = secondsLeft % 60;
-                char buffer[32];
-                snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
-                constructionTimerLabel->Text = buffer;
-            }
-            EnemyGroup->Clear();
         }
-    }
+        else { // WAVE phase
+            waveTimer += deltaTime;
+
+            // Check if wave is complete (all enemies spawned and no enemies left)
+            if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
+                // Clear any remaining enemies (just to be safe)
+                for (auto& obj : EnemyGroup->GetObjects()) {
+                    EnemyGroup->RemoveObject(obj->GetObjectIterator());
+                }
+                
+                if (currentWave >= 3) {
+                    // Update high score before switching scene
+                    accountManager.updateHighScore(totalScore);
+
+                    // Pass score and name to WinScene
+                    auto* winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
+                    if (winScene) {
+                        winScene->SetFinalScore(totalScore);
+                        winScene->SetPlayerName(accountManager.getCurrentUsername());
+                    }
+
+                    // Change to win scene
+                    Engine::GameEngine::GetInstance().ChangeScene("win");
+                    return;
+                }
+                currentWave++;
+                // Always go to construction phase, even after last wave
+                currentPhase = GamePhase::CONSTRUCTION;
+                constructionTimer = ConstructionTime;
+                // Reset construction timer label text for new construction phase
+                if (constructionTimerLabel) {
+                    int secondsLeft = static_cast<int>(ceil(constructionTimer));
+                    int minutes = secondsLeft / 60;
+                    int seconds = secondsLeft % 60;
+                    char buffer[32];
+                    snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+                    constructionTimerLabel->Text = buffer;
+                }
+                EnemyGroup->Clear();
+            }
+        }
 
     // Update phase indicator UI
     if (currentPhase == GamePhase::CONSTRUCTION && constructionTimerLabel) {
@@ -402,7 +409,6 @@ void PlayScene::Update(float deltaTime) {
         }
     }
 
-    // Clean up destroyed turrets
     std::vector<Turret*> turretsToRemove;
     const auto& towerObjects = TowerGroup->GetObjects();
     for (auto it = towerObjects.begin(); it != towerObjects.end(); ++it) {
@@ -411,10 +417,11 @@ void PlayScene::Update(float deltaTime) {
             turretsToRemove.push_back(turret);
         }
     }
+
     for (Turret* turret : turretsToRemove) {
         TowerGroup->RemoveObject(turret->GetObjectIterator());
     }
-    
+
     if (preview) {
         preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
         // To keep responding when paused.
@@ -425,6 +432,7 @@ void PlayScene::Update(float deltaTime) {
 
     printf("Active bullets: %zu\n", BulletGroup->GetObjects().size());
 }
+
 void PlayScene::Draw() const {
     IScene::Draw();
     if (TileMapGroup) {
@@ -556,6 +564,20 @@ void PlayScene::Draw() const {
                 }
             }
         }
+    }
+
+    if (wrenchMode) {
+        int infoX = Engine::GameEngine::GetInstance().GetScreenSize().x - 200;
+        int infoY = 50;
+        
+        al_draw_filled_rounded_rectangle(infoX, infoY, infoX + 180, infoY + 40, 
+                                        5, 5, al_map_rgba(0, 0, 0, 180));
+        al_draw_rounded_rectangle(infoX, infoY, infoX + 180, infoY + 40,
+                                5, 5, al_map_rgb(255, 255, 255), 2);
+        
+        Engine::Label upgradeInfo("Upgrade: +" + std::to_string((int)wrenchUpgradeAmount) + "s", 
+                                "pirulen.ttf", 16, infoX + 10, infoY + 10);
+        upgradeInfo.Draw();
     }
 }
 void PlayScene::OnMouseDown(int button, int mx, int my) {
@@ -706,8 +728,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             }
 
             // Add upgrade button in the middle of the box
-            upgradeButton = new Engine::ImageButton("play/upgrade.png", "play/upgrade.png", 
-                                                        boxX + 180, boxY + 50, 45, 32);
+            upgradeButton = new Engine::ImageButton("play/upgrade.png", "play/upgrade.png", boxX + 180, boxY + 50, 45, 32);
             upgradeButton->SetOnClickCallback([this, btn, localSelectedTurretX, localSelectedTurretY]() {
                 Turret* targetTurret = nullptr;
                 // Find the turret at the stored grid position
@@ -722,8 +743,8 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
                         }
                     }
                 }
-                
-                if (targetTurret) {
+
+            if (targetTurret) {
                     int upgradeCost = targetTurret->GetUpgradeCost();
                     if (money >= upgradeCost) {
                         EarnMoney(-upgradeCost);
@@ -742,7 +763,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             upgradeButton->SetHoverTint(al_map_rgb(255, 165, 0)); // Orange when hovered
             upgradeButton->SetNormalTint(al_map_rgb(255, 255, 255)); // White when normal
             UIGroup->AddNewControlObject(upgradeButton);
-            //turretInfoLabels.push_back(nullptr); // Placeholder for the button in the vector
+
         }
         
         // Add cost label for turrets and landmine
@@ -781,14 +802,16 @@ void PlayScene::OnMouseMove(int mx, int my) {
     
     // Don't hide/show target/shovel cursors when showing turret info
     if (!turretInfoLabelInUI) {
-        if (!preview && !shovelMode || x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
+        if (!preview && !shovelMode  && !wrenchMode|| x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
             imgTarget->Visible = false;
             imgShovel->Visible = false;
+            imgWrench->Visible = false;
             return;
         }
 
         imgTarget->Visible = false;
         imgShovel->Visible = false;
+        imgWrench->Visible = false;
         
         if (x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
             return;
@@ -796,7 +819,10 @@ void PlayScene::OnMouseMove(int mx, int my) {
 
         if (shovelMode) {
             imgShovel->Visible = true;
-        } 
+        }
+        else if (wrenchMode) {
+            imgWrench->Visible = true;
+        }
         else if (preview) {
             imgTarget->Visible = true;
         }
@@ -804,6 +830,10 @@ void PlayScene::OnMouseMove(int mx, int my) {
         if (shovelMode) {
             imgShovel->Position.x = x * BlockSize;
             imgShovel->Position.y = y * BlockSize;
+        }
+        else if (wrenchMode) {
+            imgWrench->Position.x = x * BlockSize;
+            imgWrench->Position.y = y * BlockSize;
         }
         else if (preview) {
             imgTarget->Position.x = x * BlockSize;
@@ -815,7 +845,7 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
     if (paused) return;
     if(currentPhase != GamePhase::CONSTRUCTION) return;
     IScene::OnMouseUp(button, mx, my);
-    if (!imgTarget->Visible && !imgShovel->Visible)
+    if (!imgTarget->Visible && !imgShovel->Visible && !imgWrench->Visible)
         return;
     const int x = mx / BlockSize;
     const int y = my / BlockSize;
@@ -836,6 +866,30 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
                 }
             }
             shovelMode = false; // Exit shovel mode if clicked on empty space
+        }
+        else if (wrenchMode) {
+            for (auto& it : TowerGroup->GetObjects()) {
+                Turret* turret = dynamic_cast<Turret*>(it);
+                if (turret) {
+                    int turretX = static_cast<int>(turret->Position.x) / BlockSize;
+                    int turretY = static_cast<int>(turret->Position.y) / BlockSize;
+                    if (turretX == x && turretY == y) {
+                        // Upgrade the turret's maxLifeTime
+                        turret->IncreaseLifetime(wrenchUpgradeAmount);
+                        
+                        // Visual feedback
+                        GroundEffectGroup->AddNewObject(
+                            new DirtyEffect("play/target.png", 1, 
+                            x * BlockSize + BlockSize / 2, 
+                            y * BlockSize + BlockSize / 2)
+                        );
+
+                        EarnMoney(-100);
+                        break;
+                    }
+                }
+            }
+            wrenchMode = false; // Exit wrench mode after upgrade
         }
         else if (mapState[y][x] != TILE_OCCUPIED || dynamic_cast<Landmine*>(preview)) {
             // Original turret placement code
@@ -1085,13 +1139,13 @@ void PlayScene::ConstructUI() {
     UIGroup->AddNewControlObject(btn);
     //Button 4 (Feli's Turret)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+                           Engine::Sprite("play/tower-base.png", 1522, 136, 0, 0, 0, 0),
                            Engine::Sprite("play/turret-6.png", 1522, 136 - 8, 0, 0, 0, 0), 1522, 136, RocketTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
     //Button 5 (shovel)
     btn = new TurretButton( "play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel-base.png", 1294, 200, 0, 0, 0, 0),
         Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
     UIGroup->AddNewControlObject(btn);
@@ -1100,6 +1154,13 @@ void PlayScene::ConstructUI() {
         Engine::Sprite("play/tower-base.png", 1370, 200, 0, 0, 0, 0),
         Engine::Sprite("play/landmine.png", 1370, 200 - 8, 0, 0, 0, 0), 1370, 200, Landmine::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5)); // Use ID 5 for shovel
+    UIGroup->AddNewControlObject(btn);
+
+    // Button 7 (wrench) - Add this new button
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+    Engine::Sprite("play/shovel-base.png", 1446, 200, 0, 0, 0, 0),
+    Engine::Sprite("play/wrench.png", 1446, 200, 0, 0, 0, 0), 1446, 200, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6)); // Use ID 6 for shovel
     UIGroup->AddNewControlObject(btn);
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
@@ -1193,6 +1254,21 @@ void PlayScene::UIBtnClicked(int id) {
     }
     else if (id == 5 && money >= Landmine::Price)
         preview = new Landmine(1402, 232);
+    else if (id == 6) {  // Wrench button
+        preview = nullptr;
+        wrenchMode = true;
+        shovelMode = false;
+        OnMouseMove(Engine::GameEngine::GetInstance().GetMousePosition().x, 
+                   Engine::GameEngine::GetInstance().GetMousePosition().y);
+        if (imgWrench) {
+            imgWrench->Visible = true;
+            imgWrench->Position.x = (Engine::GameEngine::GetInstance().GetMousePosition().x / BlockSize) * BlockSize;
+            imgWrench->Position.y = (Engine::GameEngine::GetInstance().GetMousePosition().y / BlockSize) * BlockSize;
+        }
+        ClearTurretInfo();
+        return;
+    }
+
     if (!preview)
         return;
     preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
