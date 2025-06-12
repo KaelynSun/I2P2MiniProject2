@@ -20,6 +20,13 @@ protected:
     int money;
     PlayScene *getPlayScene();
     virtual void OnExplode();
+    // Atk logic
+    float attackRange;
+    float attackDamage;
+    float attackCooldown;
+    float reloadTime = 0;
+    Turret* attackTarget = nullptr;
+    std::string bulletImage; // Add this line
 
 public:
     std::string type;
@@ -34,6 +41,7 @@ public:
     float getHP() const { return hp; }
     void setHP(float value) { hp = value; }
     void Hit(float damage, bool isAOE);
+    void Attack();
     void UpdatePath(const std::vector<std::vector<int>> &mapDistance);
     void Update(float deltaTime) override;
     void Draw() const override;
