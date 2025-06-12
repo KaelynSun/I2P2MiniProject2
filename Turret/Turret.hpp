@@ -22,9 +22,18 @@ protected:
     PlayScene *getPlayScene();
     // Reference: Design Patterns - Factory Method.
     virtual void CreateBullet() = 0;
-    float hp, atk;
+    float atk;
+    float hp; // <-- Add this line
+    // Attacked logic
+    float maxHP;
+    bool isDestroyed = false;
 
 public:
+    // Attacked logic
+    void TakeDamage(float damage);
+    void DestroyTurret();  // Add this line
+    bool IsDestroyed() const { return isDestroyed; }
+    float GetMaxHP() const { return maxHP; }  
     // New methods for upgrading
     virtual void SetDamage(float damage) { this->atk = damage; }
     virtual void SetHealth(float health) { this->hp = health; }
