@@ -14,12 +14,16 @@ PlayScene *Bullet::getPlayScene() {
 }
 void Bullet::OnExplode(Enemy *enemy) {
 }
-Bullet::Bullet(std::string img, float speed, float damage, Engine::Point position, Engine::Point forwardDirection, float rotation, Turret *parent) : Sprite(img, position.x, position.y), speed(speed), damage(damage), parent(parent) {
+Bullet::Bullet(std::string img, float speed, float damage, Engine::Point position, Engine::Point forwardDirection, float rotation, Turret *parent, float width, float height)
+    : Sprite(img, position.x, position.y, width, height), speed(speed), damage(damage), parent(parent) {
     Velocity = forwardDirection.Normalize() * speed;
     Rotation = rotation;
     CollisionRadius = 4;
+    // Remove or comment out any line that sets Size here, so derived classes can control Size.
+    // Size = Engine::Point(32, 32); // <-- REMOVE or COMMENT OUT this line if present
 }
 void Bullet::Update(float deltaTime) {
+    Position = Position + Velocity * deltaTime; // Move bullet by velocity
     Sprite::Update(deltaTime);
     PlayScene *scene = getPlayScene();
     // Can be improved by Spatial Hash, Quad Tree, ...
@@ -38,4 +42,8 @@ void Bullet::Update(float deltaTime) {
     // Check if out of boundary.
     if (!Engine::Collider::IsRectOverlap(Position - Size / 2, Position + Size / 2, Engine::Point(0, 0), PlayScene::GetClientSize()))
         getPlayScene()->BulletGroup->RemoveObject(objectIterator);
+}
+
+void Bullet::Draw() const {
+    Sprite::Draw();
 }
