@@ -15,6 +15,12 @@ file(COPY allegro_monolith-5.2.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 add_executable(2025_I2P2_TowerDefense
     Bullet/Bullet.cpp
     Bullet/Bullet.hpp
+    Bullet/EnemyBullet.cpp
+    Bullet/EnemyBullet.cpp
+    Bullet/TankBullet.cpp
+    Bullet/TankBullet.cpp
+    Bullet/PlaneBullet.cpp
+    Bullet/PlaneBullet.cpp
     Bullet/FireBullet.cpp
     Bullet/FireBullet.hpp
     Bullet/LaserBullet.cpp
