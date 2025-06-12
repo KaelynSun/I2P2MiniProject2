@@ -54,5 +54,7 @@ public:
     void Update(float deltaTime) override;
     void Draw() const override;
     int GetPrice() const;
+    void IncreaseLifetime(float amount) { maxLifetime += amount; }
+    float GetLifetime() const { return maxLifetime; }
 };
 #endif   // TURRET_HPP
