@@ -72,3 +72,10 @@ void Landmine::Update(float deltaTime) {
     }
 }
 
+void Landmine::Draw() const {
+    // Only draw the sprite, do not draw health bar.
+    Sprite::Draw();
+    // Optionally, add debug drawing if needed.
+    // if (PlayScene::DebugMode) { ... }
+}
+
