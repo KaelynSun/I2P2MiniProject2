@@ -8,6 +8,7 @@ public:
     Landmine(float x, float y);
 
     void Update(float deltaTime) override;
+    void Draw() const override;
     void CreateBullet() override {} // No bullets needed
     void Upgrade() override {
         atk *= 1.5f;
