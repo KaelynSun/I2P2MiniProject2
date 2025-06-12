@@ -31,6 +31,8 @@ private:
     std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> deathBGMInstance;
     int totalScore = 0;
     bool shovelMode = false;
+    bool wrenchMode = false;
+    float wrenchUpgradeAmount = 10.0f;
     float waveEndDelayTimer;
     Enemy* hoveredEnemy = nullptr;
     void showAccountDialog();
@@ -41,6 +43,7 @@ protected:
     int lives;
     int money;
     int SpeedMult;
+    Turret* selectedTurret = nullptr;
 
 public:
     void FreeMapTile(int x, int y);
@@ -111,6 +114,7 @@ public:
 
     Engine::Image *imgTarget;
     Engine::Image *imgShovel;
+    Engine::Image *imgWrench;
     Engine::Sprite *dangerIndicator;
     Turret *preview;
     std::vector<std::vector<TileType>> mapState;
