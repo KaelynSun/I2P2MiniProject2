@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Bullet/Bullet.hpp"
+#include "Bullet/EnemyBullet.hpp"
 #include "Enemy.hpp"
 #include "Engine/AudioHelper.hpp"
 #include "Engine/GameEngine.hpp"
@@ -14,8 +15,10 @@
 #include "Engine/LOG.hpp"
 #include "Scene/PlayScene.hpp"
 #include "Turret/Turret.hpp"
+#include "Turret/Landmine.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "UI/Animation/ExplosionEffect.hpp"
+#include "Enemy/TankEnemy.hpp"
 
 PlayScene *Enemy::getPlayScene() {
     return dynamic_cast<PlayScene *>(Engine::GameEngine::GetInstance().GetActiveScene());
@@ -49,6 +52,48 @@ void Enemy::Hit(float damage, bool isAOE) {
         getPlayScene()->EarnMoney(money);
         getPlayScene()->EnemyGroup->RemoveObject(objectIterator);
         AudioHelper::PlayAudio("explosion.wav");
+    }
+}
+void Enemy::Attack() {
+    if (!attackTarget || attackTarget->IsDestroyed() || !attackTarget->Enabled) {
+        attackTarget = nullptr;
+        return;
+    }
+    
+    if (attackTarget) {
+        // Calculate direction from enemy to target
+        Engine::Point direction = attackTarget->Position - Position;
+        direction = direction.Normalize(); // Normalize to get unit vector
+        
+        // Set bullet position slightly ahead of enemy
+        float offsetDistance = 30.0f;
+        Engine::Point bulletPosition = Position + direction * offsetDistance;
+        
+        // Calculate proper rotation angle for the bullet
+        float rotation = atan2(direction.y, direction.x);
+
+        // Use the bulletImage member variable
+        EnemyBullet* bullet = new EnemyBullet(
+            bulletImage, // Use per-enemy bullet image
+            300.0f,
+            attackDamage,
+            bulletPosition,
+            direction,
+            rotation
+        );
+
+        // Add to scene safely
+        if (getPlayScene() && getPlayScene()->BulletGroup) {
+            getPlayScene()->BulletGroup->AddNewObject(bullet);
+            // Play different sound for tank enemy using dynamic_cast
+            if (dynamic_cast<TankEnemy*>(this)) {
+                AudioHelper::PlayAudio("explosion.wav");
+            } else {
+                AudioHelper::PlayAudio("gun.wav");
+            }
+        } else {
+            delete bullet; // Clean up if can't add to scene
+        }
     }
 }
 void Enemy::UpdatePath(const std::vector<std::vector<int>> &mapDistance) {
@@ -115,6 +160,45 @@ void Enemy::Update(float deltaTime) {
     }
     Rotation = atan2(Velocity.y, Velocity.x);
     Sprite::Update(deltaTime);
+
+    // Attack logic - reworked to find best target
+    Turret* bestTarget = nullptr;
+    float closestDistance = std::numeric_limits<float>::max();
+    
+    PlayScene* scene = getPlayScene();
+    for (auto& obj : scene->TowerGroup->GetObjects()) {
+        Turret* turret = dynamic_cast<Turret*>(obj);
+        // Skip if not a turret, destroyed, disabled, or is a landmine
+        if (turret && !turret->IsDestroyed() && turret->Enabled) {
+            // Skip landmines using dynamic_cast
+            if (dynamic_cast<Landmine*>(turret)) continue;
+            Engine::Point diff = turret->Position - Position;
+            float distance = diff.Magnitude();
+            if (distance <= attackRange && distance < closestDistance) {
+                closestDistance = distance;
+                bestTarget = turret;
+            }
+        }
+    }
+
+    // Update target if we found a better one
+    if (bestTarget != attackTarget) {
+        attackTarget = bestTarget;
+        reloadTime = 0; // Allow immediate attack on new target
+    }
+
+    if (attackTarget) {
+        Engine::Point diff = attackTarget->Position - Position;
+        // Face the target
+        Rotation = atan2(diff.y, diff.x);
+        
+        // Attack cooldown
+        reloadTime -= deltaTime;
+        if (reloadTime <= 0) {
+            Attack();
+            reloadTime = attackCooldown;
+        }
+    }
 }
 void Enemy::Draw() const {
     Sprite::Draw();
