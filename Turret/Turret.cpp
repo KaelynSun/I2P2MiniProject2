@@ -11,8 +11,8 @@
 #include "Engine/Point.hpp"
 #include "Scene/PlayScene.hpp"
 #include "Turret.hpp"
-#include "UI/Animation/ExplosionEffect.hpp"
-#include "Engine/AudioHelper.hpp"    
+#include "UI/Animation/ExplosionEffect.hpp"  // For ExplosionEffect
+#include "Engine/AudioHelper.hpp"           // For AudioHelper
 
 PlayScene *Turret::getPlayScene() {
     return dynamic_cast<PlayScene *>(Engine::GameEngine::GetInstance().GetActiveScene());
@@ -28,6 +28,9 @@ void Turret::Update(float deltaTime) {
     Sprite::Update(deltaTime);
     PlayScene *scene = getPlayScene();
     imgBase.Position = Position;
+
+    // Reset tint to normal (white) at the start of each update
+    Tint = al_map_rgb(255, 255, 255);
     imgBase.Tint = Tint;
 
     lifetime += deltaTime; // Increase time alive
@@ -94,12 +97,14 @@ void Turret::Draw() const {
     imgBase.Draw();
     Sprite::Draw();
 
-    if (!Enabled) {
+    // Only draw red "X" if not in preview mode
+    if (!Preview && !Enabled) {
         // Draw a red "X" or overlay if broken
         al_draw_line(Position.x - 10, Position.y - 10, Position.x + 10, Position.y + 10, al_map_rgb(255, 0, 0), 3);
         al_draw_line(Position.x - 10, Position.y + 10, Position.x + 10, Position.y - 10, al_map_rgb(255, 0, 0), 3);
     }
     
+    // Show health bar only if not destroyed
     if (!Preview && !isDestroyed) {
         // Draw health bar
         float healthRatio = hp / maxHP;
@@ -135,11 +140,9 @@ void Turret::Draw() const {
         al_draw_circle(Position.x, Position.y, CollisionRadius, al_map_rgb(0, 0, 255), 2);
     }
 }
-
 int Turret::GetPrice() const {
     return price;
 }
-
 void Turret::TakeDamage(float damage) {
     if (isDestroyed || !Enabled) return;
     
@@ -153,7 +156,6 @@ void Turret::TakeDamage(float damage) {
         DestroyTurret();
     }
 }
-
 void Turret::DestroyTurret() {
     if (isDestroyed) return;
     
