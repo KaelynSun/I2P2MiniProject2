@@ -43,6 +43,7 @@ protected:
     int SpeedMult;
 
 public:
+    void FreeMapTile(int x, int y);
     // Construction phase
     enum class GamePhase { CONSTRUCTION, WAVE };
     bool gameStarted = false;
