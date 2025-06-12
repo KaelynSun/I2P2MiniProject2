@@ -42,7 +42,7 @@
 // TODO HACKATHON-5 (2/4): The "LIFE" label are not updated when you lose a life. Try to fix it. [DONE line 280]
 
 bool PlayScene::paused = false;
-const float PlayScene::ConstructionTime = 5.0f;  // or whatever value you want
+const float PlayScene::ConstructionTime = 10.0f;  // or whatever value you want
 static Engine::Label* turretInfoLabel = nullptr;
 static bool turretInfoLabelInUI = false;
 static int selectedTurretX = -1;
@@ -60,12 +60,16 @@ const std::vector<int> PlayScene::code = { //CHEAT CODE SEQUENCE HERE
     ALLEGRO_KEY_B, ALLEGRO_KEY_A, ALLEGRO_KEY_LSHIFT, ALLEGRO_KEY_ENTER
 };
 
+void PlayScene::FreeMapTile(int x, int y) {
+    if (x >= 0 && x < MapWidth && y >= 0 && y < MapHeight) {
+        mapState[y][x] = TILE_FLOOR;
+    }
+}
 float PlayScene::CalculateDistance(const Engine::Point& p1, const Engine::Point& p2) {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;
     return sqrt(dx*dx + dy*dy);
 }
-
 Engine::Point PlayScene::GetClientSize() {
     return Engine::Point(MapWidth * BlockSize, MapHeight * BlockSize);
 }
@@ -150,75 +154,91 @@ void PlayScene::Terminate() {
 }
 
 void PlayScene::Update(float deltaTime) {
-    // If we use deltaTime directly, then we might have Bullet-through-paper problem.
-    // Reference: Bullet-Through-Paper
+    // If paused, skip updating game objects (enemies, bullets, etc.)
+    if (paused) {
+        // Still update UI and preview for responsiveness
+        if (preview) {
+            preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
+            preview->Update(0);
+        }
+        GroundEffectGroup->Update(0);
+        return;
+    }
 
     // Construction
     // Handle game phases
-        if (currentPhase == GamePhase::CONSTRUCTION) {
-            constructionTimer -= deltaTime;
-            if (constructionTimer < 0) constructionTimer = 0;
-            // Update label
-            int secondsLeft = static_cast<int>(ceil(constructionTimer));
-            int minutes = secondsLeft / 60;
-            int seconds = secondsLeft % 60;
-            char buffer[32];
-            snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
-            constructionTimerLabel->Text = buffer;
-            // Only go to win scene if all rounds are done AND this is the final construction phase (after all waves)
-            if (constructionTimer <= 0) {
-                if (currentWave >= 4) { // Ensure win only after 4 rounds
-                    Engine::GameEngine::GetInstance().ChangeScene("win");
-                    return;
-                }
-                // Only put the current round's enemies in the queue at the start of each wave
-                enemyWaveData = allEnemyWaves[currentWave];
-                currentPhase = GamePhase::WAVE;
-                constructionTimerLabel->Text = "";
-                ticks = 0; // Reset ticks to start enemy spawn timing fresh
+    if (currentPhase == GamePhase::CONSTRUCTION) {
+        constructionTimer -= deltaTime;
+        if (constructionTimer < 0) constructionTimer = 0;
+        // Update label
+        int secondsLeft = static_cast<int>(ceil(constructionTimer));
+        int minutes = secondsLeft / 60;
+        int seconds = secondsLeft % 60;
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+        constructionTimerLabel->Text = buffer;
+        // Only go to win scene if all rounds are done AND this is the final construction phase (after all waves)
+        if (constructionTimer <= 0) {
+            if (currentWave >= 4) { // Ensure win only after 4 rounds
+                Engine::GameEngine::GetInstance().ChangeScene("win");
+                return;
+            }
+            // Only put the current round's enemies in the queue at the start of each wave
+            enemyWaveData = allEnemyWaves[currentWave];
+            currentPhase = GamePhase::WAVE;
+            constructionTimerLabel->Text = "";
+            ticks = 0; // Reset ticks to start enemy spawn timing fresh
+
+            // Remove preview when entering WAVE phase
+            if (preview) {
+                UIGroup->RemoveObject(preview->GetObjectIterator());
+                preview = nullptr;
+                imgTarget->Visible = false;
+                imgShovel->Visible = false;
             }
         }
-        else { // WAVE phase
-            waveTimer += deltaTime;
+    }
+    else { // WAVE phase
+        waveTimer += deltaTime;
 
-            // Check if wave is complete (all enemies spawned and no enemies left)
-            if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
-                // Clear any remaining enemies (just to be safe)
-                for (auto& obj : EnemyGroup->GetObjects()) {
-                    EnemyGroup->RemoveObject(obj->GetObjectIterator());
-                }
-                
-                if (currentWave >= 3) {
-                    // Update high score before switching scene
-                    accountManager.updateHighScore(totalScore);
-
-                    // Pass score and name to WinScene
-                    auto* winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
-                    if (winScene) {
-                        winScene->SetFinalScore(totalScore);
-                        winScene->SetPlayerName(accountManager.getCurrentUsername());
-                    }
-
-                    // Change to win scene
-                    Engine::GameEngine::GetInstance().ChangeScene("win");
-                    return;
-                }
-                currentWave++;
-                // Always go to construction phase, even after last wave
-                currentPhase = GamePhase::CONSTRUCTION;
-                constructionTimer = ConstructionTime;
-                // Reset construction timer label text for new construction phase
-                if (constructionTimerLabel) {
-                    int secondsLeft = static_cast<int>(ceil(constructionTimer));
-                    int minutes = secondsLeft / 60;
-                    int seconds = secondsLeft % 60;
-                    char buffer[32];
-                    snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
-                    constructionTimerLabel->Text = buffer;
-                }
-                EnemyGroup->Clear();
+        // Check if wave is complete (all enemies spawned and no enemies left)
+        if (enemyWaveData.empty() && EnemyGroup->GetObjects().empty()) {
+            // Clear any remaining enemies (just to be safe)
+            for (auto& obj : EnemyGroup->GetObjects()) {
+                EnemyGroup->RemoveObject(obj->GetObjectIterator());
             }
+            
+            if (currentWave >= 3) {
+                // Update high score before switching scene
+                accountManager.updateHighScore(totalScore);
+
+                // Pass score and name to WinScene
+                auto* winScene = dynamic_cast<WinScene*>(Engine::GameEngine::GetInstance().GetScene("win"));
+                if (winScene) {
+                    winScene->SetFinalScore(totalScore);
+                    winScene->SetPlayerName(accountManager.getCurrentUsername());
+                }
+
+                // Change to win scene
+                Engine::GameEngine::GetInstance().ChangeScene("win");
+                return;
+            }
+            currentWave++;
+            // Always go to construction phase, even after last wave
+            currentPhase = GamePhase::CONSTRUCTION;
+            constructionTimer = ConstructionTime;
+            // Reset construction timer label text for new construction phase
+            if (constructionTimerLabel) {
+                int secondsLeft = static_cast<int>(ceil(constructionTimer));
+                int minutes = secondsLeft / 60;
+                int seconds = secondsLeft % 60;
+                char buffer[32];
+                snprintf(buffer, sizeof(buffer), "Construction: %d:%02d", minutes, seconds);
+                constructionTimerLabel->Text = buffer;
+            }
+            EnemyGroup->Clear();
         }
+    }
 
     // Update phase indicator UI
     if (currentPhase == GamePhase::CONSTRUCTION && constructionTimerLabel) {
@@ -381,6 +401,19 @@ void PlayScene::Update(float deltaTime) {
             enemy->Update(ticks);
         }
     }
+
+    // Clean up destroyed turrets
+    std::vector<Turret*> turretsToRemove;
+    const auto& towerObjects = TowerGroup->GetObjects();
+    for (auto it = towerObjects.begin(); it != towerObjects.end(); ++it) {
+        Turret* turret = dynamic_cast<Turret*>(*it);
+        if (turret && turret->IsDestroyed()) {
+            turretsToRemove.push_back(turret);
+        }
+    }
+    for (Turret* turret : turretsToRemove) {
+        TowerGroup->RemoveObject(turret->GetObjectIterator());
+    }
     
     if (preview) {
         preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
@@ -389,6 +422,8 @@ void PlayScene::Update(float deltaTime) {
     }
     // Add update call for GroundEffectGroup to update DirtyEffect objects
     GroundEffectGroup->Update(deltaTime);
+
+    printf("Active bullets: %zu\n", BulletGroup->GetObjects().size());
 }
 void PlayScene::Draw() const {
     IScene::Draw();
