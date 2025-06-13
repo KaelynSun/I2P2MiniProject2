@@ -9,14 +9,13 @@
 #include "MachineGunTurret.hpp"
 #include "Scene/PlayScene.hpp"
 
-const int MachineGunTurret::Price = 50;
+const int MachineGunTurret::Price = 100;
 MachineGunTurret::MachineGunTurret(float x, float y)
-    : Turret("play/tower-base.png", "play/turret-1.png", x, y, 200, Price, 0.5) {
-    maxLifetime = 15.0f;
+    : Turret("play/tower-base.png", "play/turret-1.png", x, y, 200, Price, 0.3) {
     // Move center downward, since we the turret head is slightly biased upward.
     Anchor.y += 8.0f / GetBitmapHeight();
-    atk = 20.0f;  // Set initial attack value
-    hp = 100.0f;  // Set initial health value
+    hp = 800.0f;
+    maxHP = 800.0f;
 }
 void MachineGunTurret::CreateBullet() {
     Engine::Point diff = Engine::Point(cos(Rotation - ALLEGRO_PI / 2), sin(Rotation - ALLEGRO_PI / 2));
