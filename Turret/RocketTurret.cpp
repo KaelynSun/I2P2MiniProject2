@@ -9,12 +9,15 @@
 #include "RocketTurret.hpp"
 #include "Scene/PlayScene.hpp"
 
-const int RocketTurret::Price = 500;
+const int RocketTurret::Price = 200;
 RocketTurret::RocketTurret(float x, float y)
-    : Turret("play/tower-base.png", "play/turret-6.png", x, y, 500, Price, 1.5) {
-        maxLifetime = 40.0f;
+    : Turret("play/tower-base.png", "play/turret-6.png", x, y, 500, Price, 2.0) {
+        maxLifetime = 50.0f;
     // Move center downward, since we the turret head is slightly biased upward.
     Anchor.y += 8.0f / GetBitmapHeight();
+    hp = 500.0f;
+    maxHP = 500.0f;
+    atk = 30; // Attack will be set by specific turret types
 }
 void RocketTurret::CreateBullet() {
     Engine::Point diff = Engine::Point(cos(Rotation - ALLEGRO_PI / 2), sin(Rotation - ALLEGRO_PI / 2));
