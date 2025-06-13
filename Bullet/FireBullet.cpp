@@ -12,6 +12,7 @@
 class Turret;
 
 FireBullet::FireBullet(Engine::Point position, Engine::Point forwardDirection, float rotation, Turret *parent) : Bullet("play/bullet-1.png", 500, 1, position, forwardDirection, rotation - ALLEGRO_PI / 2, parent) {
+    damage = 15;
 }
 void FireBullet::OnExplode(Enemy *enemy) {
     std::random_device dev;
