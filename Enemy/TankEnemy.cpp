@@ -10,9 +10,9 @@ TankEnemy::TankEnemy(int x, int y)
     : Enemy("play/enemy-3.png", x, y, 20, 20, 100, 50),
       head("play/enemy-3-head.png", x, y), targetRotation(0) {
     bulletImage = "play/bullet-4.png"; // Set the bullet image for this enemy
-    attackRange = 400; 
-    attackDamage = 20; 
-    attackCooldown = 2.0f; 
+    attackRange = 200; 
+    attackDamage = 25; 
+    attackCooldown = 3.0f; 
 }
 void TankEnemy::Draw() const {
     Enemy::Draw();
