@@ -3,7 +3,7 @@
 #include <cmath>
 #include "Scene/PlayScene.hpp"
 
-SupportEnemy::SupportEnemy(int x, int y) : Enemy("play/enemy-4.png", x, y, 50, 80, 20, 50) {
+SupportEnemy::SupportEnemy(int x, int y) : Enemy("play/enemy-4.png", x, y, 50, 80, 100, 40) {
     type = "Support";
     supportRadius = 500;
 }
