@@ -96,7 +96,7 @@ void PlayScene::Initialize() {
     ticks = 0;
     deathCountDown = -1;
     lives = 10;
-    money = 500;
+    money = 300;
     SpeedMult = 1;
     enemiesKilled = 0;
     gameStarted = false; // Reset gameStarted flag on initialization
@@ -474,7 +474,7 @@ void PlayScene::Draw() const {
     }
     if (turretInfoLabel && turretInfoLabelInUI) {
         int boxX = 1300;
-        int boxY = 300;
+        int boxY = 310;
         int boxW = 280;
         int boxH = 150;
 
@@ -620,12 +620,13 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
 
         // Check if mouse is over a turret button
         std::vector<TurretBtnInfo> btns = {
-            {1294, 136, 64, 64, "Machine Gun", 20, 100, ""},
-            {1370, 136, 64, 64, "Laser Turret", 40, 80, ""},
-            {1446, 136, 64, 64, "Rocket Turret", 60, 120, ""},
-            {1522, 136, 64, 64, "Pierce Turret", 30, 90, ""},
-            {1294, 215, 64, 64, "Shovel", 0, 0, ""},
-            {1370, 215, 64, 64, "Landmine", 100, 1, ""},
+            {1294, 136, 64, 64, "Machine Gun", 15, 80, ""},
+            {1370, 136, 64, 64, "Laser Turret", 20, 100, ""},
+            {1446, 136, 64, 64, "Pierce Turret", 30, 150, ""},
+            {1522, 136, 64, 64, "Rocket Turret", 25, 120, ""},
+            {1370, 215, 64, 64, "Shovel", 0, 0, ""}, // swapped with landmine
+            {1294, 215, 64, 64, "Landmine", 40, 1, ""}, // swapped with shovel
+            {1446, 215, 64, 64, "Wrench", 0, 0, ""}  // Add this line for the wrench
         };
         for (const auto& btn : btns) {
             if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
@@ -664,9 +665,16 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
     ClearTurretInfo(); // Clear any existing info first
     // Position the info box
     int boxX = 1310;
-    int boxY = 310;
+    int boxY = 320; // lowered by 10 pixels to match turret button row shift
     int boxW = 280;
     int boxH = 160;
+
+    // Move stats box position for shovel and landmine to right side fixed position
+    if (btn.name == "Shovel" || btn.name == "Landmine") {
+        int screenWidth = Engine::GameEngine::GetInstance().GetScreenSize().x;
+        boxX = screenWidth - boxW - 10; // 20 px padding from right edge
+        boxY = 320;
+    }
     
     // Adjust position if it would go off-screen
     int screenWidth = Engine::GameEngine::GetInstance().GetScreenSize().x;
@@ -692,7 +700,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
         // Update existing labels' text
         turretInfoLabel->Text = "";
         turretInfoLabels[0]->Text = btn.name;
-        if (btn.name != "Shovel") {
+        if (btn.name != "Shovel" && btn.name != "Wrench") {
             if (actualTurret) {
                 turretInfoLabels[1]->Text = "Attack: " + std::to_string(static_cast<int>(actualTurret->GetDamage()));
                 turretInfoLabels[2]->Text = "Health: " + std::to_string(static_cast<int>(actualTurret->GetHealth()));
@@ -721,7 +729,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
         turretInfoLabels.push_back(nameLabel);
 
         // Add stats labels only for turrets (not shovel)
-        if (btn.name != "Shovel") {
+        if (btn.name != "Shovel" && btn.name != "Wrench") {
             if (actualTurret) {
                 Engine::Label* atkLabel = new Engine::Label("Attack: " + std::to_string(actualTurret->GetDamage()), "pirulen.ttf", 14, boxX + 10, boxY + 40, 0, 0, 0);
                 UIGroup->AddNewObject(atkLabel);
@@ -740,47 +748,47 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
                 turretInfoLabels.push_back(hpLabel);
             }
 
-            // Add upgrade button in the middle of the box
-            upgradeButton = new Engine::ImageButton("play/upgrade.png", "play/upgrade.png", boxX + 180, boxY + 50, 45, 32);
-            upgradeButton->SetOnClickCallback([this, btn, localSelectedTurretX, localSelectedTurretY]() {
-                Turret* targetTurret = nullptr;
-                // Find the turret at the stored grid position
-                for (auto& it : TowerGroup->GetObjects()) {
-                    Turret* turret = dynamic_cast<Turret*>(it);
-                    if (turret) {
-                        int turretX = static_cast<int>(turret->Position.x) / BlockSize;
-                        int turretY = static_cast<int>(turret->Position.y) / BlockSize;
-                        if (turretX == localSelectedTurretX && turretY == localSelectedTurretY) {
-                            targetTurret = turret;
-                            break;
-                        }
-                    }
-                }
+            // // Add upgrade button in the middle of the box
+            // upgradeButton = new Engine::ImageButton("play/upgrade.png", "play/upgrade.png", boxX + 180, boxY + 50, 45, 32);
+            // upgradeButton->SetOnClickCallback([this, btn, localSelectedTurretX, localSelectedTurretY]() {
+            //     Turret* targetTurret = nullptr;
+            //     // Find the turret at the stored grid position
+            //     for (auto& it : TowerGroup->GetObjects()) {
+            //         Turret* turret = dynamic_cast<Turret*>(it);
+            //         if (turret) {
+            //             int turretX = static_cast<int>(turret->Position.x) / BlockSize;
+            //             int turretY = static_cast<int>(turret->Position.y) / BlockSize;
+            //             if (turretX == localSelectedTurretX && turretY == localSelectedTurretY) {
+            //                 targetTurret = turret;
+            //                 break;
+            //             }
+            //         }
+            //     }
                 
-                if (targetTurret) {
-                    int upgradeCost = targetTurret->GetUpgradeCost();
-                    if (money >= upgradeCost) {
-                        EarnMoney(-upgradeCost);
-                        targetTurret->Upgrade();
+            //     if (targetTurret) {
+            //         int upgradeCost = targetTurret->GetUpgradeCost();
+            //         if (money >= upgradeCost) {
+            //             EarnMoney(-upgradeCost);
+            //             targetTurret->Upgrade();
                         
-                        // Update the displayed stats immediately
-                        if (turretInfoLabels.size() >= 3) {
-                            turretInfoLabels[1]->Text = "Attack: " + std::to_string(static_cast<int>(targetTurret->GetDamage()));
-                            turretInfoLabels[2]->Text = "Health: " + std::to_string(static_cast<int>(targetTurret->GetHealth()));
-                        }
-                    }
-                }
-            });
+            //             // Update the displayed stats immediately
+            //             if (turretInfoLabels.size() >= 3) {
+            //                 turretInfoLabels[1]->Text = "Attack: " + std::to_string(static_cast<int>(targetTurret->GetDamage()));
+            //                 turretInfoLabels[2]->Text = "Health: " + std::to_string(static_cast<int>(targetTurret->GetHealth()));
+            //             }
+            //         }
+            //     }
+            // });
 
-            // Set up hover effects
-            upgradeButton->SetHoverTint(al_map_rgb(255, 165, 0)); // Orange when hovered
-            upgradeButton->SetNormalTint(al_map_rgb(255, 255, 255)); // White when normal
-            UIGroup->AddNewControlObject(upgradeButton);
-            //turretInfoLabels.push_back(nullptr); // Placeholder for the button in the vector
+            // // Set up hover effects
+            // upgradeButton->SetHoverTint(al_map_rgb(255, 165, 0)); // Orange when hovered
+            // upgradeButton->SetNormalTint(al_map_rgb(255, 255, 255)); // White when normal
+            // UIGroup->AddNewControlObject(upgradeButton);
+            // //turretInfoLabels.push_back(nullptr); // Placeholder for the button in the vector
         }
         
         // Add cost label for turrets and landmine
-        if (btn.name != "Shovel") {
+        if (btn.name != "Shovel" && btn.name != "Wrench") {
             int cost = 0;
             if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
             else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
@@ -788,7 +796,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
             else if (btn.name == "Landmine") cost = Landmine::Price;
             
-            Engine::Label* costLabel = new Engine::Label("Upgrade cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
+            Engine::Label* costLabel = new Engine::Label("Cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
             UIGroup->AddNewObject(costLabel);
             turretInfoLabels.push_back(costLabel);
         }
@@ -856,7 +864,8 @@ void PlayScene::OnMouseMove(int mx, int my) {
 }
 void PlayScene::OnMouseUp(int button, int mx, int my) {
     if (paused) return;
-    if(currentPhase != GamePhase::CONSTRUCTION) return;
+    // Remove construction phase check for wrench
+    // if(currentPhase != GamePhase::CONSTRUCTION) return;
     IScene::OnMouseUp(button, mx, my);
     if (!imgTarget->Visible && !imgShovel->Visible && !imgWrench->Visible)
         return;
@@ -887,9 +896,20 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
                     int turretX = static_cast<int>(turret->Position.x) / BlockSize;
                     int turretY = static_cast<int>(turret->Position.y) / BlockSize;
                     if (turretX == x && turretY == y) {
-                        // Upgrade the turret's maxLifeTime
-                        turret->IncreaseLifetime(wrenchUpgradeAmount);
+                        // Don't allow wrench on destroyed turrets
+                        if (turret->IsDestroyed())
+                            break;
+                        // Check if player has enough money
+                        if (money < 100) {
+                            break; // Not enough money, do nothing
+                        }
+                        // If turret is disabled, enable it and upgrade
+                        if (!turret->Enabled) {
+                            turret->Enabled = true;
+                        } 
                         
+                        turret->IncreaseLifetime(wrenchUpgradeAmount);
+
                         // Visual feedback
                         GroundEffectGroup->AddNewObject(
                             new DirtyEffect("play/target.png", 1, 
@@ -1159,24 +1179,24 @@ void PlayScene::ConstructUI() {
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
 
-    // Button 5 (shovel)
+    // Button 5 (landmine) - swapped position with shovel
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel-base.png", 1294, 225, 0, 0, 0, 0),
-        Engine::Sprite("play/shovel.png", 1294, 225, 0, 0, 0, 0), 1294, 225, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
+        Engine::Sprite("play/tower-base.png", 1294, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/landmine.png", 1294, 235, 0, 0, 0, 0), 1294, 235, Landmine::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
     UIGroup->AddNewControlObject(btn);
 
-    // Button 6 (landmine)
+    // Button 6 (shovel) - swapped position with landmine
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1370, 225, 0, 0, 0, 0),
-        Engine::Sprite("play/landmine.png", 1370, 225 - 8, 0, 0, 0, 0), 1370, 225, Landmine::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
+        Engine::Sprite("play/shovel-base.png", 1370, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1370, 235, 0, 0, 0, 0), 1370, 235, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
     UIGroup->AddNewControlObject(btn);
 
     // Button 7 (wrench)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel-base.png", 1446, 225, 0, 0, 0, 0),
-        Engine::Sprite("play/wrench.png", 1446, 225, 0, 0, 0, 0), 1446, 225, 0);
+        Engine::Sprite("play/shovel-base.png", 1446, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/wrench.png", 1446, 235, 0, 0, 0, 0), 1446, 235, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
     UIGroup->AddNewControlObject(btn);
 
@@ -1231,10 +1251,13 @@ const std::vector<PlayScene::TurretBtnInfo> PlayScene::turretBtnInfos = {
     {1522, 136, 64, 64, "Pierce", 30, 90, ""},
     {1294, 215, 64, 64, "Shovel", 0, 0, ""},
     {1370, 215, 64, 64, "Landmine", 100, 1, ""},
+    {1446, 215, 64, 64, "Wrench", 0, 0, ""}
 };
 
 void PlayScene::UIBtnClicked(int id) {
-    if (currentPhase != GamePhase::CONSTRUCTION) return;
+    // Only restrict turret placement and shovel to construction phase,
+    // but allow wrench to be used in any phase.
+    if (id != 6 && currentPhase != GamePhase::CONSTRUCTION) return;
     
     Engine::Point mousePos = Engine::GameEngine::GetInstance().GetMousePosition();
     
@@ -1256,7 +1279,7 @@ void PlayScene::UIBtnClicked(int id) {
         preview = new RocketTurret(0, 0);
         shovelMode = false; // Exit shovel mode if a turret is selected
     }
-    else if (id == 4) {
+    else if (id == 4) { // swapped with landmine
         preview = nullptr;
         shovelMode = true;
         // Update shovel cursor visibility and position immediately after selecting shovel
@@ -1269,8 +1292,9 @@ void PlayScene::UIBtnClicked(int id) {
         ClearTurretInfo();
         return;
     }
-    else if (id == 5 && money >= Landmine::Price)
+    else if (id == 5 && money >= Landmine::Price) { // swapped with shovel
         preview = new Landmine(1402, 232);
+    }
     else if (id == 6) {  // Wrench button
         preview = nullptr;
         wrenchMode = true;
