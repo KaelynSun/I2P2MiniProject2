@@ -8,4 +8,5 @@ PlaneEnemy::PlaneEnemy(int x, int y) : Enemy("play/enemy-2.png", x, y, 10, 50, 5
     attackRange = 400; 
     attackDamage = 15; 
     attackCooldown = 1.8f; 
+    this->type = "Plane";
 }
