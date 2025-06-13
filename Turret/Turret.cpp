@@ -147,6 +147,7 @@ void Turret::TakeDamage(float damage) {
     if (isDestroyed || !Enabled) return;
     
     hp -= damage;
+    if (hp < 0) hp = 0;
     printf("Turret took %f damage, remaining HP: %f/%f\n", damage, hp, maxHP);
     
     // Visual feedback for being hit
