@@ -13,7 +13,10 @@
 class Turret;
 
 PierceBullet::PierceBullet(Engine::Point position, Engine::Point forwardDirection, float rotation, Turret* parent, int maxPierce)
-    : Bullet("play/bullet-3.png", 800, 2, position, forwardDirection, rotation + ALLEGRO_PI/2, parent), pierceCount(maxPierce) {
+    : Bullet("play/bullet-3.png", 800, 2, position, forwardDirection, rotation - ALLEGRO_PI/2, parent), pierceCount(maxPierce) {
+    // Tip direction is set by the 'rotation' argument here (rotation + ALLEGRO_PI/2)
+    // If you want to rotate 180 degrees, use rotation + ALLEGRO_PI, etc.
+    damage = 25;
 }
 
 void PierceBullet::OnExplode(Enemy* enemy) {
