@@ -1133,46 +1133,51 @@ void PlayScene::ConstructUI() {
     TurretButton *btn;
     // Button 1
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1294, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-1.png", 1294, 136 - 8, 0, 0, 0, 0), 1294, 136, MachineGunTurret::Price);
-    // Reference: Class Member Function Pointer and std::bind.
+        Engine::Sprite("play/tower-base.png", 1294, 161, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-1.png", 1294, 161 - 8, 0, 0, 0, 0), 1294, 161, MachineGunTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 0));
     UIGroup->AddNewControlObject(btn);
+
     // Button 2
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1370, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-2.png", 1370, 136 - 8, 0, 0, 0, 0), 1370, 136, LaserTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1370, 161, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-2.png", 1370, 161 - 8, 0, 0, 0, 0), 1370, 161, LaserTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
     UIGroup->AddNewControlObject(btn);
-    //Button 3
+
+    // Button 3
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-3.png", 1446, 136 - 8, 0, 0, 0, 0), 1446, 136, PierceTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1446, 161, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-3.png", 1446, 161 - 8, 0, 0, 0, 0), 1446, 161, PierceTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
     UIGroup->AddNewControlObject(btn);
-    //Button 4 (Feli's Turret)
+
+    // Button 4
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-6.png", 1522, 136 - 8, 0, 0, 0, 0), 1522, 136, RocketTurret::Price);
+        Engine::Sprite("play/tower-base.png", 1522, 161, 0, 0, 0, 0),
+        Engine::Sprite("play/turret-6.png", 1522, 161 - 8, 0, 0, 0, 0), 1522, 161, RocketTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
-    //Button 5 (shovel)
-    btn = new TurretButton( "play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0),
-        Engine::Sprite("play/shovel.png", 1294, 200, 0, 0, 0, 0), 1294, 200, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));  // Use ID 4 for shovel
-    UIGroup->AddNewControlObject(btn);
-    //Button 6 (landmine)
+
+    // Button 5 (shovel)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1370, 200, 0, 0, 0, 0),
-        Engine::Sprite("play/landmine.png", 1370, 200 - 8, 0, 0, 0, 0), 1370, 200, Landmine::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5)); // Use ID 5 for shovel
+        Engine::Sprite("play/shovel-base.png", 1294, 225, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1294, 225, 0, 0, 0, 0), 1294, 225, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
     UIGroup->AddNewControlObject(btn);
-    // Button 7 (wrench) - Add this new button
+
+    // Button 6 (landmine)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-    Engine::Sprite("play/shovel-base.png", 1446, 200, 0, 0, 0, 0),
-    Engine::Sprite("play/wrench.png", 1446, 200, 0, 0, 0, 0), 1446, 200, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6)); // Use ID 6 for shovel
+        Engine::Sprite("play/tower-base.png", 1370, 225, 0, 0, 0, 0),
+        Engine::Sprite("play/landmine.png", 1370, 225 - 8, 0, 0, 0, 0), 1370, 225, Landmine::Price);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
+    UIGroup->AddNewControlObject(btn);
+
+    // Button 7 (wrench)
+    btn = new TurretButton("play/floor.png", "play/dirt.png",
+        Engine::Sprite("play/shovel-base.png", 1446, 225, 0, 0, 0, 0),
+        Engine::Sprite("play/wrench.png", 1446, 225, 0, 0, 0, 0), 1446, 225, 0);
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
     UIGroup->AddNewControlObject(btn);
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
