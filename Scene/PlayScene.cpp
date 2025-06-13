@@ -476,7 +476,7 @@ void PlayScene::Draw() const {
         int boxX = 1300;
         int boxY = 310;
         int boxW = 280;
-        int boxH = 150;
+        int boxH = 200; // Increased height to fit Effectiveness and Weakness
 
         al_draw_filled_rounded_rectangle(boxX, boxY, boxX + boxW, boxY + boxH,
                                         10, 10, al_map_rgba(0, 0, 0, 80)); // semi-transparent black
@@ -667,7 +667,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
     int boxX = 1310;
     int boxY = 320; // lowered by 10 pixels to match turret button row shift
     int boxW = 280;
-    int boxH = 160;
+    int boxH = 200; // Increased height to fit additional info
 
     // Move stats box position for shovel and landmine to right side fixed position
     if (btn.name == "Shovel" || btn.name == "Landmine") {
@@ -715,6 +715,33 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
             else if (btn.name == "Landmine") cost = Landmine::Price;
             turretInfoLabels[3]->Text = "Upgrade cost: $" + std::to_string(cost);
+
+            // Update new labels for Effectiveness and Weakness with actual values
+            if (btn.name == "Rocket Turret") {
+                turretInfoLabels[4]->Text = "Effectiveness: Plane, Tank";
+            } else if (btn.name == "Laser Turret") {
+                turretInfoLabels[4]->Text = "Effectiveness: Support";
+            } else if (btn.name == "Machine Gun Turret") {
+                turretInfoLabels[4]->Text = "Effectiveness: Soldier";
+            } else if (btn.name == "Pierce Turret") {
+                turretInfoLabels[4]->Text = "Effectiveness: Plane";
+            } else if (btn.name == "Landmine") {
+                turretInfoLabels[4]->Text = "Effectiveness: Soldier";
+            } else {
+                turretInfoLabels[4]->Text = "Effectiveness: ";
+            }
+            // Update Weakness label with actual values
+            if (btn.name == "Laser Turret") {
+                turretInfoLabels[5]->Text = "Weakness: Plane";
+            } else if (btn.name == "Machine Gun Turret") {
+                turretInfoLabels[5]->Text = "Weakness: Tank";
+            } else if (btn.name == "Pierce Turret") {
+                turretInfoLabels[5]->Text = "Weakness: Support";
+            } else if (btn.name == "Landmine") {
+                turretInfoLabels[5]->Text = "Weakness: Plane";
+            } else {
+                turretInfoLabels[5]->Text = "Weakness: ";
+            }
         }
     } else {
         ClearTurretInfo(); // Clear any existing info first
@@ -748,43 +775,38 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
                 turretInfoLabels.push_back(hpLabel);
             }
 
-            // // Add upgrade button in the middle of the box
-            // upgradeButton = new Engine::ImageButton("play/upgrade.png", "play/upgrade.png", boxX + 180, boxY + 50, 45, 32);
-            // upgradeButton->SetOnClickCallback([this, btn, localSelectedTurretX, localSelectedTurretY]() {
-            //     Turret* targetTurret = nullptr;
-            //     // Find the turret at the stored grid position
-            //     for (auto& it : TowerGroup->GetObjects()) {
-            //         Turret* turret = dynamic_cast<Turret*>(it);
-            //         if (turret) {
-            //             int turretX = static_cast<int>(turret->Position.x) / BlockSize;
-            //             int turretY = static_cast<int>(turret->Position.y) / BlockSize;
-            //             if (turretX == localSelectedTurretX && turretY == localSelectedTurretY) {
-            //                 targetTurret = turret;
-            //                 break;
-            //             }
-            //         }
-            //     }
-                
-            //     if (targetTurret) {
-            //         int upgradeCost = targetTurret->GetUpgradeCost();
-            //         if (money >= upgradeCost) {
-            //             EarnMoney(-upgradeCost);
-            //             targetTurret->Upgrade();
-                        
-            //             // Update the displayed stats immediately
-            //             if (turretInfoLabels.size() >= 3) {
-            //                 turretInfoLabels[1]->Text = "Attack: " + std::to_string(static_cast<int>(targetTurret->GetDamage()));
-            //                 turretInfoLabels[2]->Text = "Health: " + std::to_string(static_cast<int>(targetTurret->GetHealth()));
-            //             }
-            //         }
-            //     }
-            // });
+            // Add new labels for Effectiveness and Weakness with actual values
+            Engine::Label* effectivenessLabel;
+            if (btn.name == "Rocket Turret") {
+                effectivenessLabel = new Engine::Label("Effectiveness: Tank", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            } else if (btn.name == "Laser Turret") {
+                effectivenessLabel = new Engine::Label("Effectiveness: Support", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            } else if (btn.name == "Machine Gun") {
+                effectivenessLabel = new Engine::Label("Effectiveness: Soldier", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            } else if (btn.name == "Pierce Turret") {
+                effectivenessLabel = new Engine::Label("Effectiveness: Plane", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            } else if (btn.name == "Landmine") {
+                effectivenessLabel = new Engine::Label("Effectiveness: Soldier", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            } else {
+                effectivenessLabel = new Engine::Label("Effectiveness: ", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+            }
+            UIGroup->AddNewObject(effectivenessLabel);
+            turretInfoLabels.push_back(effectivenessLabel);
 
-            // // Set up hover effects
-            // upgradeButton->SetHoverTint(al_map_rgb(255, 165, 0)); // Orange when hovered
-            // upgradeButton->SetNormalTint(al_map_rgb(255, 255, 255)); // White when normal
-            // UIGroup->AddNewControlObject(upgradeButton);
-            // //turretInfoLabels.push_back(nullptr); // Placeholder for the button in the vector
+            Engine::Label* weaknessLabel;
+            if (btn.name == "Laser Turret") {
+                weaknessLabel = new Engine::Label("Weakness: Plane", "pirulen.ttf", 14, boxX + 10, boxY + 130, 0, 0, 0);
+            } else if (btn.name == "Machine Gun") {
+                weaknessLabel = new Engine::Label("Weakness: Tank", "pirulen.ttf", 14, boxX + 10, boxY + 130, 0, 0, 0);
+            } else if (btn.name == "Pierce Turret") {
+                weaknessLabel = new Engine::Label("Weakness: Support", "pirulen.ttf", 14, boxX + 10, boxY + 130, 0, 0, 0);
+            } else if (btn.name == "Landmine") {
+                weaknessLabel = new Engine::Label("Weakness: Plane", "pirulen.ttf", 14, boxX + 10, boxY + 130, 0, 0, 0);
+            } else {
+                weaknessLabel = new Engine::Label("Weakness: ", "pirulen.ttf", 14, boxX + 10, boxY + 130, 0, 0, 0);
+            }
+            UIGroup->AddNewObject(weaknessLabel);
+            turretInfoLabels.push_back(weaknessLabel);
         }
         
         // Add cost label for turrets and landmine
@@ -796,7 +818,7 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
             else if (btn.name == "Landmine") cost = Landmine::Price;
             
-            Engine::Label* costLabel = new Engine::Label("Cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + (btn.name == "Shovel" ? 70 : 100), 0, 0, 0);
+            Engine::Label* costLabel = new Engine::Label("Cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + 160, 0, 0, 0);
             UIGroup->AddNewObject(costLabel);
             turretInfoLabels.push_back(costLabel);
         }
