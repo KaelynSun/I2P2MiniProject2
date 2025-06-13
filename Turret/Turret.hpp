@@ -16,7 +16,7 @@ protected:
     float reload = 0;
     float rotateRadian = 2 * ALLEGRO_PI;
     float lifetime = 0; // Tracks how long the turret has been on the field
-    float maxLifetime = 30.0f; // Turret breaks down after 30 seconds
+    float maxLifetime = 60.0f; // Turret breaks down after 30 seconds
     Sprite imgBase;
     std::list<Turret *>::iterator lockedTurretIterator;
     PlayScene *getPlayScene();
