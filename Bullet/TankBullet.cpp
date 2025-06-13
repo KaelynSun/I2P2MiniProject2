@@ -17,7 +17,7 @@
 TankBullet::TankBullet(std::string img, float speed, float damage,
                          Engine::Point position, Engine::Point forwardDirection,
                          float /*rotation*/) :
-    Bullet(img, speed, damage, position, forwardDirection, 0, nullptr, 180, 180) {
+    Bullet(img, speed, damage, position, forwardDirection, std::atan2(forwardDirection.y, forwardDirection.x) + ALLEGRO_PI, nullptr, 180, 180) {
     // Make tank bullets even bigger by loading bitmap with larger width and height
     Size = Engine::Point(180, 180); // Set size explicitly
     CollisionRadius = 90;           // Adjust collision radius accordingly (made bigger)
@@ -29,7 +29,7 @@ TankBullet::TankBullet(std::string img, float speed, float damage,
     Anchor = Engine::Point(0.5, 0.5);
 
     // Set the rotation so the "up" asset points toward the turret
-    Rotation = std::atan2(forwardDirection.y, forwardDirection.x) - ALLEGRO_PI / 2;
+    Rotation = std::atan2(forwardDirection.y, forwardDirection.x) - ALLEGRO_PI/2;
 
     // Verify image was loaded
     if (!bmp) {
