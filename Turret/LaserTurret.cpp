@@ -9,11 +9,13 @@
 #include "LaserTurret.hpp"
 #include "Scene/PlayScene.hpp"
 
-const int LaserTurret::Price = 200;
-LaserTurret::LaserTurret(float x, float y) : Turret("play/tower-base.png", "play/turret-2.png", x, y, 300, Price, 0.5) {
-    maxLifetime = 30.0f;
+const int LaserTurret::Price = 120;
+LaserTurret::LaserTurret(float x, float y) : Turret("play/tower-base.png", "play/turret-2.png", x, y, 300, Price, 0.8) {
     // Move center downward, since we the turret head is slightly biased upward.
     Anchor.y += 8.0f / GetBitmapHeight();
+    hp = 700.0f;
+    maxHP = 700.0f;
+    atk = 20; // Attack will be set by specific turret types
 }
 void LaserTurret::CreateBullet() {
     Engine::Point diff = Engine::Point(cos(Rotation - ALLEGRO_PI / 2), sin(Rotation - ALLEGRO_PI / 2));
