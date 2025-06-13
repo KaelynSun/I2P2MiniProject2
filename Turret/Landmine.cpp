@@ -51,9 +51,13 @@ void Landmine::Update(float deltaTime) {
     for (auto& it : scene->EnemyGroup->GetObjects()) {
         Engine::Point diff = it->Position - Position;
         if (diff.Magnitude() <= CollisionRadius) {
-            // Deal damage and explode
+            // Deal damage and explode only if enemy is not a plane
             Enemy* enemy = dynamic_cast<Enemy*>(it);
             if (enemy) {
+                if (enemy->type == "Plane") {
+                    // Skip explosion and damage for planes
+                    continue;
+                }
                 enemy->Hit(40, true); // true = AOE hit
             }
             
