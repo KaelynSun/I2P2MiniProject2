@@ -10,7 +10,7 @@
 #include "Scene/PlayScene.hpp"
 #include "UI/Animation/ExplosionEffect.hpp"
 
-const int Landmine::Price = 200;
+const int Landmine::Price = 110;
 
 Landmine::Landmine(float x, float y) :
     Turret("play/landmine.png", "play/landmine.png", x, y, 60, Price, 999) {
@@ -18,6 +18,7 @@ Landmine::Landmine(float x, float y) :
     // We can also disable reload by overriding Update()
     Target = nullptr;
     CollisionRadius = 1;
+    atk = 40; // Attack will be set by specific turret types
 }
 
 void Landmine::Update(float deltaTime) {
@@ -53,7 +54,7 @@ void Landmine::Update(float deltaTime) {
             // Deal damage and explode
             Enemy* enemy = dynamic_cast<Enemy*>(it);
             if (enemy) {
-                enemy->Hit(100, true); // true = AOE hit
+                enemy->Hit(40, true); // true = AOE hit
             }
             
             // Create explosion effect
