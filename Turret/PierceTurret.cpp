@@ -9,12 +9,14 @@
 #include "PierceTurret.hpp"
 #include "Scene/PlayScene.hpp"
 
-const int PierceTurret::Price = 200;
+const int PierceTurret::Price = 130;
 
 PierceTurret::PierceTurret(float x, float y)
-    : Turret("play/tower-base.png", "play/turret-3.png", x, y, 350, Price, 0.8) {
-        maxLifetime = 35.0f;
+    : Turret("play/tower-base.png", "play/turret-3.png", x, y, 350, Price, 1.5) {
+        maxLifetime = 40.0f;
     Anchor.y += 8.0f / GetBitmapHeight();
+    hp = 600.0f;
+    maxHP = 600.0f;
 }
 
 void PierceTurret::CreateBullet() {
