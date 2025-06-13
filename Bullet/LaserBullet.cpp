@@ -12,6 +12,7 @@
 class Turret;
 
 LaserBullet::LaserBullet(Engine::Point position, Engine::Point forwardDirection, float rotation, Turret *parent) : Bullet("play/bullet-2.png", 800, 2, position, forwardDirection, rotation - ALLEGRO_PI / 2, parent) {
+    damage = 20;
 }
 void LaserBullet::OnExplode(Enemy *enemy) {
     std::random_device dev;
