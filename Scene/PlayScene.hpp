@@ -48,6 +48,7 @@ protected:
 public:
     void FreeMapTile(int x, int y);
     // Construction phase
+    bool effectsPlaying = false;
     enum class GamePhase { CONSTRUCTION, WAVE };
     bool gameStarted = false;
     GamePhase currentPhase;
