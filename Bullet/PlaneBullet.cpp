@@ -30,7 +30,7 @@ PlaneBullet::PlaneBullet(std::string img, float speed, float damage,
     Rotation = atan2(normDir.y, normDir.x) + ALLEGRO_PI/2;
 
     Anchor = Engine::Point(0.5, 0.5);
-
+        
     // Verify image was loaded
     if (!bmp) {
         Size = Engine::Point(40, 40); // Fallback size for missing image
