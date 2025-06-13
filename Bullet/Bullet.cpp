@@ -54,11 +54,11 @@ void Bullet::Update(float deltaTime) {
                 if ((dynamic_cast<PlaneEnemy*>(enemy) && turretName == "Laser Turret") ||
                     (dynamic_cast<TankEnemy*>(enemy) && turretName == "Machine Gun Turret") ||
                     (dynamic_cast<SupportEnemy*>(enemy) && turretName == "Pierce Turret") ||
-                    ((dynamic_cast<PlaneEnemy*>(enemy) || dynamic_cast<SupportEnemy*>(enemy)) && turretName == "Landmine")) {
+                    ((dynamic_cast<PlaneEnemy*>(enemy) && turretName == "Landmine"))) {
                     appliedDamage = 0.0f;
                 }
                 // Damage multiplier cases
-                else if ((dynamic_cast<PlaneEnemy*>(enemy) || dynamic_cast<TankEnemy*>(enemy)) && turretName == "Rocket Turret") {
+                else if (dynamic_cast<TankEnemy*>(enemy) && turretName == "Rocket Turret") {
                     appliedDamage *= 1.5f;
                 } else if (dynamic_cast<SupportEnemy*>(enemy) && turretName == "Laser Turret") {
                     appliedDamage *= 1.5f;
