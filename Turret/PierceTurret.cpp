@@ -9,7 +9,7 @@
 #include "PierceTurret.hpp"
 #include "Scene/PlayScene.hpp"
 
-const int PierceTurret::Price = 130;
+const int PierceTurret::Price = 150;
 
 PierceTurret::PierceTurret(float x, float y)
     : Turret("play/tower-base.png", "play/turret-3.png", x, y, 350, Price, 1.5) {
