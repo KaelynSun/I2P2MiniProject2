@@ -36,3 +36,6 @@ Mediocre:
 Difficult:
 - Local Account System
 - Construction
+
+Asset source:
+- https://www.instagram.com/p/CzgGpqULGjb/
