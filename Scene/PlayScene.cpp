@@ -470,6 +470,7 @@ void PlayScene::Draw() const {
     if (UIGroup) {
         UIGroup->Draw();
     }
+
     if (turretInfoLabel && turretInfoLabelInUI) {
         int boxX = 1300;
         int boxY = 310;
@@ -1375,77 +1376,71 @@ bool PlayScene::CheckSpaceValid(int x, int y) {
 void PlayScene::CreateEnemyListUI() {
     // Position below the turret buttons
     int startX = 1294;
-    int startY = 300; // Below the last turret button
+    int startY = 500;
     
+    // Compact layout settings
+    int columnWidth = 120;    // Width of each column
+    int columnGap = 10;       // Gap between columns
+    int iconSize = 20;        // Icon size
+    int rowHeight = 15;       // Height of each enemy row
+    int waveTitleHeight = 120; // Vertical space for each wave block
+    int wavesPerColumn = 2;   // Number of waves per column
+
+    // Enemy data
+    std::map<int, std::string> enemyNames = {
+        {1, "Soldier"}, {2, "Plane"}, {3, "Tank"}, {4, "Support"}
+    };
+    std::map<int, std::string> enemyImages = {
+        {1, "play/enemy-1.png"}, {2, "play/enemy-2.png"},
+        {3, "play/enemy-3.png"}, {4, "play/enemy-4.png"}
+    };
+
     // Add title label
     UIGroup->AddNewObject(new Engine::Label("Enemies in Wave:", "pirulen.ttf", 18, startX, startY));
 
-    std::map<int, std::string> enemyNames = {
-        {1, "Soldier"},
-        {2, "Plane"},
-        {3, "Tank"},
-        {4, "Support"}
-    };
-
-    std::map<int, std::string> enemyImages = {
-        {1, "play/enemy-1.png"},
-        {2, "play/enemy-2.png"},
-        {3, "play/enemy-3.png"},
-        {4, "play/enemy-4.png"}
-    };
-    
     // Create enemy icons and counts for each wave
-    for (int wave = 0; wave < 4; wave++) {
+    for (int wave = 0; wave < allEnemyWaves.size(); wave++) {
         // Count enemies for this wave
         std::map<int, int> enemyCounts;
         for (const auto& enemyData : allEnemyWaves[wave]) {
             enemyCounts[enemyData.first]++;
         }
 
-        // If enemy wave empty, just skip the wave
         if (enemyCounts.empty()) continue;
         
-        // Create wave label
-        int waveY = startY + 30 + wave * 100;
-        UIGroup->AddNewObject(new Engine::Label("Wave " + std::to_string(wave+1) + ":", "pirulen.ttf", 16, startX, waveY));
+        // Calculate position - waves 1-2 in left column, 3-4 in right column
+        int column = wave / wavesPerColumn;
+        int waveInColumn = wave % wavesPerColumn;
         
+        int waveX = startX + column * (columnWidth + columnGap + 20); // +20 for extra margin
+        int waveY = startY + 30 + waveInColumn * waveTitleHeight;
+        
+        // Create wave label
+        UIGroup->AddNewObject(new Engine::Label("Wave " + std::to_string(wave+1) + ":", 
+                             "pirulen.ttf", 16, waveX, waveY));
+
         // Create enemy icons and counts
-        int iconY = waveY + 25;
-        int iconX = startX;
-        int index = 0;
+        int iconY = waveY + 20;
         
         for (const auto& pair : enemyCounts) {
             int enemyType = pair.first;
-            std::string enemyName = enemyNames.count(enemyType) ? enemyNames[enemyType] : "Unknown";
-            std::string enemyImage = enemyImages.count(enemyType) ? enemyImages[enemyType] : "play/enemy-1.png";
+            std::string enemyName = enemyNames[enemyType];
+            std::string enemyImage = enemyImages[enemyType];
             
             // Add enemy icon
-            UIGroup->AddNewObject(new Engine::Image(enemyImage, iconX, iconY, 32, 32));
+            UIGroup->AddNewObject(new Engine::Image(enemyImage, waveX, iconY, iconSize, iconSize));
             
-            // Add enemy count
-            UIGroup->AddNewObject(new Engine::Label(
-                std::to_string(pair.second), 
-                "pirulen.ttf", 14, 
-                iconX + 40, iconY + 10
-            ));
+            // Add enemy count and name
+            std::string infoText = std::to_string(pair.second) + "x " + enemyName;
+            UIGroup->AddNewObject(new Engine::Label(infoText, "pirulen.ttf", 12, 
+                                                  waveX + iconSize + 5, iconY + 6));
             
-            // Add enemy name
-            UIGroup->AddNewObject(new Engine::Label(
-                enemyName, 
-                "pirulen.ttf", 14, 
-                iconX + 70, iconY + 10
-            ));
-            
-            // Move to next row if we've placed 2 enemies
-            if (++index % 2 == 0) {
-                iconX = startX;
-                iconY += 40;
-            } else {
-                iconX += 150;
-            }
+            // Move to next row
+            iconY += rowHeight;
         }
     }
 }
+
 
 std::vector<std::vector<int>> PlayScene::CalculateBFSDistance() {
     // Reverse BFS to find path.
