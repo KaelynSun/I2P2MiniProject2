@@ -1,3 +1,5 @@
+Whatever happens, we've done our best ^^
+
 Work done by each member:
 
 鍾佩螢:
