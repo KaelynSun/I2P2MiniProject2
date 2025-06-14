@@ -149,6 +149,6 @@ public:
     bool CheckSpaceValid(int x, int y);
     std::vector<std::vector<int>> CalculateBFSDistance();
     static float CalculateDistance(const Engine::Point& p1, const Engine::Point& p2);
-    // void ModifyReadMapTiles();
+    void CreateEnemyListUI();
 };
 #endif   // PLAYSCENE_HPP
