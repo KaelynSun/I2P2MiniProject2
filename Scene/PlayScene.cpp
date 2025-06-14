@@ -620,13 +620,13 @@ void PlayScene::OnMouseDown(int button, int mx, int my) {
 
         // Check if mouse is over a turret button
         std::vector<TurretBtnInfo> btns = {
-            {1294, 136, 64, 64, "Machine Gun", 15, 80, ""},
-            {1370, 136, 64, 64, "Laser Turret", 20, 100, ""},
-            {1446, 136, 64, 64, "Pierce Turret", 30, 150, ""},
-            {1522, 136, 64, 64, "Rocket Turret", 25, 120, ""},
-            {1370, 215, 64, 64, "Shovel", 0, 0, ""}, // swapped with landmine
-            {1294, 215, 64, 64, "Landmine", 40, 1, ""}, // swapped with shovel
-            {1446, 215, 64, 64, "Wrench", 0, 0, ""}  // Add this line for the wrench
+            {1294, 136, 64, 64, "Machine Gun", 15, 800, ""},
+            {1370, 136, 64, 64, "Laser Turret", 20, 700, ""},
+            {1446, 136, 64, 64, "Pierce Turret", 25, 600, ""},
+            {1522, 136, 64, 64, "Rocket Turret", 30, 500, ""},
+            {1294, 215, 64, 64, "Shovel", 0, 0, ""}, // swapped with landmine
+            // {1294, 215, 64, 64, "Landmine", 40, 1, ""}, // swapped with shovel
+            {1370, 215, 64, 64, "Wrench", 0, 0, ""}  // Add this line for the wrench
         };
         for (const auto& btn : btns) {
             if (mx >= btn.x && mx < btn.x + btn.w && my >= btn.y && my < btn.y + btn.h) {
@@ -755,6 +755,10 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
         UIGroup->AddNewObject(nameLabel);
         turretInfoLabels.push_back(nameLabel);
 
+        if (btn.name == "Wrench") {
+            nameLabel->Text = "Potion"; // Change display name here
+        }
+
         // Add stats labels only for turrets (not shovel)
         if (btn.name != "Shovel" && btn.name != "Wrench") {
             if (actualTurret) {
@@ -779,12 +783,16 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
             Engine::Label* effectivenessLabel;
             if (btn.name == "Rocket Turret") {
                 effectivenessLabel = new Engine::Label("Effectiveness: Tank", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+                nameLabel->Text = "Wriothesley"; 
             } else if (btn.name == "Laser Turret") {
                 effectivenessLabel = new Engine::Label("Effectiveness: Support", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+                nameLabel->Text = "Mage"; 
             } else if (btn.name == "Machine Gun") {
                 effectivenessLabel = new Engine::Label("Effectiveness: Soldier", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+                nameLabel->Text = "Assassin"; 
             } else if (btn.name == "Pierce Turret") {
                 effectivenessLabel = new Engine::Label("Effectiveness: Plane", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
+                nameLabel->Text = "Archer"; 
             } else if (btn.name == "Landmine") {
                 effectivenessLabel = new Engine::Label("Effectiveness: Soldier", "pirulen.ttf", 14, boxX + 10, boxY + 100, 0, 0, 0);
             } else {
@@ -811,11 +819,11 @@ void PlayScene::ShowTurretInfo(const TurretBtnInfo& btn, int mx, int my, Turret*
         
         // Add cost label for turrets and landmine
         if (btn.name != "Shovel" && btn.name != "Wrench") {
-            int cost = 0;
-            if (btn.name == "Machine Gun Turret") cost = MachineGunTurret::Price;
-            else if (btn.name == "Laser Turret") cost = LaserTurret::Price;
-            else if (btn.name == "Pierce Turret") cost = PierceTurret::Price;
-            else if (btn.name == "Rocket Turret") cost = RocketTurret::Price;
+            int cost = 100;
+            if (btn.name == "Machine Gun Turret") cost = 100;
+            else if (btn.name == "Laser Turret") cost = 120;
+            else if (btn.name == "Pierce Turret") cost = 150;
+            else if (btn.name == "Rocket Turret") cost = 200;
             else if (btn.name == "Landmine") cost = Landmine::Price;
             
             Engine::Label* costLabel = new Engine::Label("Cost: $" + std::to_string(cost), "pirulen.ttf", 14, boxX + 10, boxY + 160, 0, 0, 0);
@@ -1197,28 +1205,28 @@ void PlayScene::ConstructUI() {
     // Button 4
     btn = new TurretButton("play/floor.png", "play/dirt.png",
         Engine::Sprite("play/tower-base.png", 1522, 161, 0, 0, 0, 0),
-        Engine::Sprite("play/turret-6.png", 1522, 161 - 8, 0, 0, 0, 0), 1522, 161, RocketTurret::Price);
+        Engine::Sprite("play/turret-6.1.png", 1522, 161 - 8, 0, 0, 0, 0), 1522, 161, RocketTurret::Price);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
 
-    // Button 5 (landmine) - swapped position with shovel
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/tower-base.png", 1294, 235, 0, 0, 0, 0),
-        Engine::Sprite("play/landmine.png", 1294, 235, 0, 0, 0, 0), 1294, 235, Landmine::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
-    UIGroup->AddNewControlObject(btn);
+    // // Button 5 (landmine) - swapped position with shovel
+    // btn = new TurretButton("play/floor.png", "play/dirt.png",
+    //     Engine::Sprite("play/tower-base.png", 1294, 235, 0, 0, 0, 0),
+    //     Engine::Sprite("play/landmine.png", 1294, 235, 0, 0, 0, 0), 1294, 235, Landmine::Price);
+    // btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
+    // UIGroup->AddNewControlObject(btn);
 
     // Button 6 (shovel) - swapped position with landmine
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel-base.png", 1370, 235, 0, 0, 0, 0),
-        Engine::Sprite("play/shovel.png", 1370, 235, 0, 0, 0, 0), 1370, 235, 0);
+        Engine::Sprite("play/shovel-base.png", 1294, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0), 1294, 235, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
     UIGroup->AddNewControlObject(btn);
 
     // Button 7 (wrench)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
-        Engine::Sprite("play/shovel-base.png", 1446, 235, 0, 0, 0, 0),
-        Engine::Sprite("play/wrench.png", 1446, 235, 0, 0, 0, 0), 1446, 235, 0);
+        Engine::Sprite("play/shovel-base.png", 1370, 235, 0, 0, 0, 0),
+        Engine::Sprite("play/wrench.png", 1370, 235, 0, 0, 0, 0), 1370, 235, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
     UIGroup->AddNewControlObject(btn);
 
@@ -1314,9 +1322,9 @@ void PlayScene::UIBtnClicked(int id) {
         ClearTurretInfo();
         return;
     }
-    else if (id == 5 && money >= Landmine::Price) { // swapped with shovel
-        preview = new Landmine(1402, 232);
-    }
+    // else if (id == 5 && money >= Landmine::Price) { // swapped with shovel
+    //     preview = new Landmine(1402, 232);
+    // }
     else if (id == 6) {  // Wrench button
         preview = nullptr;
         wrenchMode = true;
