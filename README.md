@@ -7,7 +7,7 @@ Work done by each member:
 - Enemy Attack
 - Construction
 - Turret vs Enemy Matching
-- Turret stats view & balancing stats
+- Turret Stats View & Balancing stats
 - Bug Fixing/Debugging (50%)
 - Extra Decor/Embellishments
 
