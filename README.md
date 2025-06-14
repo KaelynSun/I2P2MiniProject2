@@ -39,3 +39,5 @@ Difficult:
 
 Asset source:
 - https://www.instagram.com/p/CzgGpqULGjb/
+- https://x.com/xinzoruo/status/1521105487722295298/photo/1
+- https://www.hoyolab.com/article/5922871
