@@ -1218,7 +1218,7 @@ void PlayScene::ConstructUI() {
     btn = new TurretButton("play/floor.png", "play/dirt.png",
         Engine::Sprite("play/shovel-base.png", 1370, 235, 0, 0, 0, 0),
         Engine::Sprite("play/wrench.png", 1370, 235, 0, 0, 0, 0), 1370, 235, 0);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
+    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
     UIGroup->AddNewControlObject(btn);
 
     CreateEnemyListUI();
