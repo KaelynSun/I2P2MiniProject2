@@ -443,8 +443,6 @@ void PlayScene::Update(float deltaTime) {
     }
     // Add update call for GroundEffectGroup to update DirtyEffect objects
     GroundEffectGroup->Update(deltaTime);
-
-    printf("Active bullets: %zu\n", BulletGroup->GetObjects().size());
 }
 void PlayScene::Draw() const {
     IScene::Draw();
@@ -1209,26 +1207,21 @@ void PlayScene::ConstructUI() {
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
     UIGroup->AddNewControlObject(btn);
 
-    // // Button 5 (landmine) - swapped position with shovel
-    // btn = new TurretButton("play/floor.png", "play/dirt.png",
-    //     Engine::Sprite("play/tower-base.png", 1294, 235, 0, 0, 0, 0),
-    //     Engine::Sprite("play/landmine.png", 1294, 235, 0, 0, 0, 0), 1294, 235, Landmine::Price);
-    // btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
-    // UIGroup->AddNewControlObject(btn);
-
-    // Button 6 (shovel) - swapped position with landmine
+    // Button 5 (shovel) - swapped position with landmine
     btn = new TurretButton("play/floor.png", "play/dirt.png",
         Engine::Sprite("play/shovel-base.png", 1294, 235, 0, 0, 0, 0),
         Engine::Sprite("play/shovel.png", 1294, 235, 0, 0, 0, 0), 1294, 235, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
     UIGroup->AddNewControlObject(btn);
 
-    // Button 7 (wrench)
+    // Button 6 (wrench)
     btn = new TurretButton("play/floor.png", "play/dirt.png",
         Engine::Sprite("play/shovel-base.png", 1370, 235, 0, 0, 0, 0),
         Engine::Sprite("play/wrench.png", 1370, 235, 0, 0, 0, 0), 1370, 235, 0);
     btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
     UIGroup->AddNewControlObject(btn);
+
+    CreateEnemyListUI();
 
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
@@ -1280,7 +1273,6 @@ const std::vector<PlayScene::TurretBtnInfo> PlayScene::turretBtnInfos = {
     {1446, 136, 64, 64, "Rocket", 60, 120, ""},
     {1522, 136, 64, 64, "Pierce", 30, 90, ""},
     {1294, 215, 64, 64, "Shovel", 0, 0, ""},
-    {1370, 215, 64, 64, "Landmine", 100, 1, ""},
     {1446, 215, 64, 64, "Wrench", 0, 0, ""}
 };
 
@@ -1322,10 +1314,7 @@ void PlayScene::UIBtnClicked(int id) {
         ClearTurretInfo();
         return;
     }
-    // else if (id == 5 && money >= Landmine::Price) { // swapped with shovel
-    //     preview = new Landmine(1402, 232);
-    // }
-    else if (id == 6) {  // Wrench button
+    else if (id == 5) {  // Wrench button
         preview = nullptr;
         wrenchMode = true;
         shovelMode = false;
@@ -1347,13 +1336,7 @@ void PlayScene::UIBtnClicked(int id) {
     preview->Preview = true;
     UIGroup->AddNewObject(preview);
     OnMouseMove(Engine::GameEngine::GetInstance().GetMousePosition().x, Engine::GameEngine::GetInstance().GetMousePosition().y);
-
-    // Show turret info for the selected button if not shovel
-    // Removed to only show on right click as per user request
-    // if (id >= 0 && id < static_cast<int>(turretBtnInfos.size()) && id != 4) {
-    //     ClearTurretInfo();
-    //     ShowTurretInfo(turretBtnInfos[id], 1310, 310);
-    // }
+    
 }
 
 bool PlayScene::CheckSpaceValid(int x, int y) {
@@ -1388,6 +1371,82 @@ bool PlayScene::CheckSpaceValid(int x, int y) {
         dynamic_cast<Enemy *>(it)->UpdatePath(mapDistance);
     return true;
 }
+
+void PlayScene::CreateEnemyListUI() {
+    // Position below the turret buttons
+    int startX = 1294;
+    int startY = 300; // Below the last turret button
+    
+    // Add title label
+    UIGroup->AddNewObject(new Engine::Label("Enemies in Wave:", "pirulen.ttf", 18, startX, startY));
+
+    std::map<int, std::string> enemyNames = {
+        {1, "Soldier"},
+        {2, "Plane"},
+        {3, "Tank"},
+        {4, "Support"}
+    };
+
+    std::map<int, std::string> enemyImages = {
+        {1, "play/enemy-1.png"},
+        {2, "play/enemy-2.png"},
+        {3, "play/enemy-3.png"},
+        {4, "play/enemy-4.png"}
+    };
+    
+    // Create enemy icons and counts for each wave
+    for (int wave = 0; wave < 4; wave++) {
+        // Count enemies for this wave
+        std::map<int, int> enemyCounts;
+        for (const auto& enemyData : allEnemyWaves[wave]) {
+            enemyCounts[enemyData.first]++;
+        }
+
+        // If enemy wave empty, just skip the wave
+        if (enemyCounts.empty()) continue;
+        
+        // Create wave label
+        int waveY = startY + 30 + wave * 100;
+        UIGroup->AddNewObject(new Engine::Label("Wave " + std::to_string(wave+1) + ":", "pirulen.ttf", 16, startX, waveY));
+        
+        // Create enemy icons and counts
+        int iconY = waveY + 25;
+        int iconX = startX;
+        int index = 0;
+        
+        for (const auto& pair : enemyCounts) {
+            int enemyType = pair.first;
+            std::string enemyName = enemyNames.count(enemyType) ? enemyNames[enemyType] : "Unknown";
+            std::string enemyImage = enemyImages.count(enemyType) ? enemyImages[enemyType] : "play/enemy-1.png";
+            
+            // Add enemy icon
+            UIGroup->AddNewObject(new Engine::Image(enemyImage, iconX, iconY, 32, 32));
+            
+            // Add enemy count
+            UIGroup->AddNewObject(new Engine::Label(
+                std::to_string(pair.second), 
+                "pirulen.ttf", 14, 
+                iconX + 40, iconY + 10
+            ));
+            
+            // Add enemy name
+            UIGroup->AddNewObject(new Engine::Label(
+                enemyName, 
+                "pirulen.ttf", 14, 
+                iconX + 70, iconY + 10
+            ));
+            
+            // Move to next row if we've placed 2 enemies
+            if (++index % 2 == 0) {
+                iconX = startX;
+                iconY += 40;
+            } else {
+                iconX += 150;
+            }
+        }
+    }
+}
+
 std::vector<std::vector<int>> PlayScene::CalculateBFSDistance() {
     // Reverse BFS to find path.
     std::vector<std::vector<int>> map(MapHeight, std::vector<int>(std::vector<int>(MapWidth, -1)));
